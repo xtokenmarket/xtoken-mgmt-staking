@@ -1,0 +1,169 @@
+pragma solidity ^0.8.0;
+
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+
+import "./interface/IxAsset.sol";
+
+/**
+ * @title RevenueController
+ * @author xToken
+ *
+ * RevenueController is the management fees charged on xAsset funds. The RevenueController contract
+ * claims fees from xAssets, exchanges fee tokens for XTK via 1inch (off-chain api data will need to
+ * be passed to permissioned function `claimAndSwap`), and then transfers XTK to Mgmt module
+ */
+contract RevenueController is Initializable, OwnableUpgradeable {
+    /* ============ State Variables ============ */
+
+    // Index of xAsset
+    uint256 public nextFundIndex;
+
+    // Address of xtk token
+    address public xtk;
+    // Address of Mgmt module
+    address public managementStakingModule;
+    // Address of OneInchExchange contract
+    address public oneInchExchange;
+    // Address to indicate ETH
+    address private constant ETH_ADDRESS = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
+
+    // Manager
+    address private manager;
+    address private manager2;
+
+    // xAsset to index
+    mapping(address => uint256) private _fundToIndex;
+    // xAsset to array of asset address that charged as fee
+    mapping(address => address[]) private _fundAssets;
+    // Index to xAsset
+    mapping(uint256 => address) private _indexToFund;
+
+    /* ============ Events ============ */
+
+    event FeesClaimed(address indexed fund, address indexed revenueToken, uint256 revenueTokenAmount);
+    event RevenueAccrued(address indexed fund, uint256 xtkAccrued, uint256 timestamp);
+    event FundAdded(address indexed fund, uint256 indexed fundIndex);
+
+    /* ============ Modifiers ============ */
+
+    modifier onlyOwnerOrManager {
+        require(msg.sender == owner() || msg.sender == manager || msg.sender == manager2, "Non-admin caller");
+        _;
+    }
+
+    /* ============ Functions ============ */
+
+    function initialize(
+        address _xtk,
+        address _managementStakingModule,
+        address _oneInchExchange,
+        address _govOps
+    ) external initializer {
+        __Ownable_init();
+
+        nextFundIndex = 1;
+
+        xtk = _xtk;
+        managementStakingModule = _managementStakingModule;
+        oneInchExchange = _oneInchExchange;
+
+        // transfer ownership to the governance
+        transferOwnership(_govOps);
+    }
+
+    /**
+     * Withdraw fees from xAsset contract, and swap fee assets into xtk token and send to Mgmt
+     *
+     * @param _fundIndex    Index of xAsset
+     * @param _oneInchData  1inch low-level calldata(genented off-chain)
+     */
+    function claimAndSwap(uint256 _fundIndex, bytes[] memory _oneInchData) external onlyOwnerOrManager {
+        require(_fundIndex > 0 && _fundIndex < nextFundIndex, "Invalid fund index");
+
+        address fund = _indexToFund[_fundIndex];
+        address[] memory fundAssets = _fundAssets[fund];
+
+        require(_oneInchData.length == fundAssets.length, "Params mismatch");
+
+        IxAsset(fund).withdrawFees();
+
+        for (uint256 i = 0; i < fundAssets.length; i++) {
+            uint256 revenueTokenBalance = getRevenueTokenBalance(fundAssets[i]);
+
+            if (revenueTokenBalance > 0) {
+                bool success;
+
+                if (fundAssets[i] == ETH_ADDRESS) {
+                    // execute 1inch swap of ETH for XTK
+                    (success, ) = oneInchExchange.call{ value: revenueTokenBalance }(_oneInchData[i]);
+                } else {
+                    // execute 1inch swap of token for XTK
+                    (success, ) = oneInchExchange.call(_oneInchData[i]);
+                }
+
+                require(success, "Low-level call with value failed");
+
+                emit FeesClaimed(fund, fundAssets[i], revenueTokenBalance);
+            }
+        }
+
+        uint256 xtkBalance = IERC20(xtk).balanceOf(address(this));
+        IERC20(xtk).transfer(managementStakingModule, xtkBalance);
+
+        emit RevenueAccrued(fund, xtkBalance, block.timestamp);
+    }
+
+    /**
+     * Governance function that adds xAssets
+     * @param _fund      Address of xAsset
+     * @param _assets    Assets charged as fee in xAsset
+     */
+    function addFund(address _fund, address[] memory _assets) external onlyOwner {
+        require(_fundToIndex[_fund] != 0, "Already added");
+        require(_assets.length > 0, "Empty fund assets");
+
+        _indexToFund[nextFundIndex] = _fund;
+        _fundToIndex[_fund] = nextFundIndex++;
+        _fundAssets[_fund] = _assets;
+
+        emit FundAdded(_fund, nextFundIndex - 1);
+    }
+
+    /*
+     * @notice manager == alternative admin caller to owner
+     */
+    function setManager(address _manager) public onlyOwner {
+        manager = _manager;
+    }
+
+    /*
+     * @notice manager2 == alternative admin caller to owner
+     */
+    function setManager2(address _manager2) public onlyOwner {
+        manager2 = _manager2;
+    }
+
+    /**
+     * Return token/eth balance of contract
+     */
+    function getRevenueTokenBalance(address _revenueToken) private view returns (uint256) {
+        if (_revenueToken == ETH_ADDRESS) return address(this).balance;
+        return IERC20(_revenueToken).balanceOf(address(this));
+    }
+
+    /**
+     * Return index of _fund
+     */
+    function getFundIndex(address _fund) public view returns (uint256) {
+        return _fundToIndex[_fund];
+    }
+
+    /**
+     * Return fee assets of _fund
+     */
+    function getFundAssets(address _fund) public view returns (address[] memory) {
+        return _fundAssets[_fund];
+    }
+}
