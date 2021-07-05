@@ -4,7 +4,8 @@
   "version": "1.0.0",
   "dependencies": {
     "@openzeppelin/contracts": "^4.1.0",
-    "@openzeppelin/contracts-upgradeable": "^4.1.0"
+    "@openzeppelin/contracts-upgradeable": "^4.1.0",
+    "axios": "^0.21.1"
   },
   "devDependencies": {
     "@commitlint/cli": "^9.1.2",

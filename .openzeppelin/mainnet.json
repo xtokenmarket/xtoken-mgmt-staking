@@ -7,8 +7,8 @@
       "hash": "0x7c6ad926912922e498288e90617fe092ee84f93022e15d371b2f9305f59df7ef",
       "type": 0,
       "accessList": null,
-      "blockHash": "0x1c4da04893940ea49179673681ef01296c1ec3c12f5bf938067d1b0bd8e7e7d1",
-      "blockNumber": 12604084,
+      "blockHash": "0xd2b7238087ee6045915254b966f4ed1b0721d2a2c600c24fbcdd9cbaa97c7371",
+      "blockNumber": 12768404,
       "transactionIndex": 0,
       "confirmations": 1,
       "from": "0x0797B98884dE920620DCD9d84C4F106374c6121C",
@@ -37,7 +37,7 @@
   "proxies": [
     {
       "address": "0xd9F9304329451Dd31908BC61C0F87e2AA90aacD6",
-      "txHash": "0xde310ad8828e61a6351c8e83fdd12e49f5077bffc49157c67a73bbfa35c38978",
+      "txHash": "0x86b5f4e0a5a9f8e5256d91580efb09a27172aca1cdb954b335a2c7ab74fd8d30",
       "kind": "transparent"
     },
     {
@@ -47,9 +47,94 @@
     }
   ],
   "impls": {
-    "02a05661d2ad83a9b6789d0db551c054326e1dafbeedf4e431f46d53a63c889a": {
+    "8eebd2239dbf0c4bc6b9fa42e0e7241703d40fde5b87eb92110b964655c43154": {
+      "address": "0x5A3Deb79F213F5d4C2702fC75eDfa41F46B5E271",
+      "txHash": "0x5f04eb5389083e8f1293b6dccd465f5dce52a93093e65df25fe1feb2c17181e8",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:23"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:28"
+          },
+          {
+            "contract": "ContextUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:31"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:20"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:74"
+          },
+          {
+            "contract": "RewardController",
+            "label": "periodFinish",
+            "type": "t_uint256",
+            "src": "contracts/RewardController.sol:21"
+          },
+          {
+            "contract": "RewardController",
+            "label": "rewardRate",
+            "type": "t_uint256",
+            "src": "contracts/RewardController.sol:23"
+          },
+          {
+            "contract": "RewardController",
+            "label": "lastUpdateTime",
+            "type": "t_uint256",
+            "src": "contracts/RewardController.sol:25"
+          },
+          {
+            "contract": "RewardController",
+            "label": "xtk",
+            "type": "t_address",
+            "src": "contracts/RewardController.sol:28"
+          },
+          {
+            "contract": "RewardController",
+            "label": "managementStakingModule",
+            "type": "t_address",
+            "src": "contracts/RewardController.sol:30"
+          }
+        ],
+        "types": {
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          },
+          "t_bool": {
+            "label": "bool"
+          }
+        }
+      }
+    },
+    "334a6cca7e9a8b9874091ee0081a873a76d26da967a15f68bb746c53ba81951a": {
       "address": "0xF5aA8e3C6BA1EdF766E197a0bCD5844Fd1ed8A27",
-      "txHash": "0x29314cbe8dc4a8b895c789b3d54a11c215955841902ebb4ef3b0ffacaf1c034b",
+      "txHash": "0x66a450ddd0c6049049b5cf80fe2106461ee4a6da68e7ba67a1f9118c0f7f43c9",
       "layout": {
         "storage": [
           {
@@ -155,91 +240,6 @@
           },
           "t_mapping(t_uint256,t_address)": {
             "label": "mapping(uint256 => address)"
-          },
-          "t_array(t_uint256)49_storage": {
-            "label": "uint256[49]"
-          },
-          "t_array(t_uint256)50_storage": {
-            "label": "uint256[50]"
-          },
-          "t_bool": {
-            "label": "bool"
-          }
-        }
-      }
-    },
-    "8eebd2239dbf0c4bc6b9fa42e0e7241703d40fde5b87eb92110b964655c43154": {
-      "address": "0x5A3Deb79F213F5d4C2702fC75eDfa41F46B5E271",
-      "txHash": "0x5f04eb5389083e8f1293b6dccd465f5dce52a93093e65df25fe1feb2c17181e8",
-      "layout": {
-        "storage": [
-          {
-            "contract": "Initializable",
-            "label": "_initialized",
-            "type": "t_bool",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:23"
-          },
-          {
-            "contract": "Initializable",
-            "label": "_initializing",
-            "type": "t_bool",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:28"
-          },
-          {
-            "contract": "ContextUpgradeable",
-            "label": "__gap",
-            "type": "t_array(t_uint256)50_storage",
-            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:31"
-          },
-          {
-            "contract": "OwnableUpgradeable",
-            "label": "_owner",
-            "type": "t_address",
-            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:20"
-          },
-          {
-            "contract": "OwnableUpgradeable",
-            "label": "__gap",
-            "type": "t_array(t_uint256)49_storage",
-            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:74"
-          },
-          {
-            "contract": "RewardController",
-            "label": "periodFinish",
-            "type": "t_uint256",
-            "src": "contracts/RewardController.sol:21"
-          },
-          {
-            "contract": "RewardController",
-            "label": "rewardRate",
-            "type": "t_uint256",
-            "src": "contracts/RewardController.sol:23"
-          },
-          {
-            "contract": "RewardController",
-            "label": "lastUpdateTime",
-            "type": "t_uint256",
-            "src": "contracts/RewardController.sol:25"
-          },
-          {
-            "contract": "RewardController",
-            "label": "xtk",
-            "type": "t_address",
-            "src": "contracts/RewardController.sol:28"
-          },
-          {
-            "contract": "RewardController",
-            "label": "managementStakingModule",
-            "type": "t_address",
-            "src": "contracts/RewardController.sol:30"
-          }
-        ],
-        "types": {
-          "t_uint256": {
-            "label": "uint256"
-          },
-          "t_address": {
-            "label": "address"
           },
           "t_array(t_uint256)49_storage": {
             "label": "uint256[49]"

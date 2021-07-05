@@ -89,6 +89,7 @@ contract RevenueController is Initializable, OwnableUpgradeable {
 
         IxAsset(fund).withdrawFees();
 
+
         for (uint256 i = 0; i < fundAssets.length; i++) {
             uint256 revenueTokenBalance = getRevenueTokenBalance(fundAssets[i]);
 
@@ -121,12 +122,18 @@ contract RevenueController is Initializable, OwnableUpgradeable {
      * @param _assets    Assets charged as fee in xAsset
      */
     function addFund(address _fund, address[] memory _assets) external onlyOwner {
-        require(_fundToIndex[_fund] != 0, "Already added");
+        require(_fundToIndex[_fund] == 0, "Already added");
         require(_assets.length > 0, "Empty fund assets");
 
         _indexToFund[nextFundIndex] = _fund;
         _fundToIndex[_fund] = nextFundIndex++;
         _fundAssets[_fund] = _assets;
+
+        for(uint256 i = 0; i < _assets.length; ++i) {
+            if(_assets[i] != ETH_ADDRESS) {
+                IERC20(_assets[i]).approve(oneInchExchange, type(uint256).max);
+            }
+        }
 
         emit FundAdded(_fund, nextFundIndex - 1);
     }
@@ -166,4 +173,9 @@ contract RevenueController is Initializable, OwnableUpgradeable {
     function getFundAssets(address _fund) public view returns (address[] memory) {
         return _fundAssets[_fund];
     }
+
+
+    /* ============ Fallbacks ============ */
+
+    receive() external payable {}
 }
