@@ -48,7 +48,7 @@ contract XTKManagementStakingModule is Initializable, ERC20Upgradeable, OwnableU
      * @param _unstakePenalty   Unstake penalty percentage
      */
     function setUnstakePenalty(uint256 _unstakePenalty) external onlyOwner {
-        require(_unstakePenalty <= DEC_18 && _unstakePenalty > 1e17, "Penalty outside range");
+        require(_unstakePenalty <= DEC_18 && _unstakePenalty > 9e17, "Penalty outside range");
         unstakePenalty = _unstakePenalty;
 
         emit SetUnstakePenalty(block.timestamp, _unstakePenalty);

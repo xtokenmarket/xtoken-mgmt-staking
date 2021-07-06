@@ -7,8 +7,8 @@
       "hash": "0x7c6ad926912922e498288e90617fe092ee84f93022e15d371b2f9305f59df7ef",
       "type": 0,
       "accessList": null,
-      "blockHash": "0xd2b7238087ee6045915254b966f4ed1b0721d2a2c600c24fbcdd9cbaa97c7371",
-      "blockNumber": 12768404,
+      "blockHash": "0x5714d37cabdb32eb814ddc9dfc702f5aa66510f0f78e1c8ca5e3147f4e13345f",
+      "blockNumber": 12770608,
       "transactionIndex": 0,
       "confirmations": 1,
       "from": "0x0797B98884dE920620DCD9d84C4F106374c6121C",
@@ -36,13 +36,13 @@
   },
   "proxies": [
     {
-      "address": "0xd9F9304329451Dd31908BC61C0F87e2AA90aacD6",
-      "txHash": "0x86b5f4e0a5a9f8e5256d91580efb09a27172aca1cdb954b335a2c7ab74fd8d30",
+      "address": "0x4A84ECFD55FdD6A05d6AF7a08e3854668EA4E657",
+      "txHash": "0x1e1d788fc5f4e7d99761bc83c987be55bfb76a1cd522470f0292d040839f8b25",
       "kind": "transparent"
     },
     {
-      "address": "0x4A84ECFD55FdD6A05d6AF7a08e3854668EA4E657",
-      "txHash": "0x1e1d788fc5f4e7d99761bc83c987be55bfb76a1cd522470f0292d040839f8b25",
+      "address": "0xd9F9304329451Dd31908BC61C0F87e2AA90aacD6",
+      "txHash": "0x750916c5a1c5d8d81ebc220f0ca47428f0da2a1e31ca4209c9fdd66e605929af",
       "kind": "transparent"
     }
   ],
@@ -132,9 +132,9 @@
         }
       }
     },
-    "334a6cca7e9a8b9874091ee0081a873a76d26da967a15f68bb746c53ba81951a": {
+    "97b729a6a77cf338901a2e081ddef9bd7b1a81fb2f8127be4b644a096acf0f4e": {
       "address": "0xF5aA8e3C6BA1EdF766E197a0bCD5844Fd1ed8A27",
-      "txHash": "0x66a450ddd0c6049049b5cf80fe2106461ee4a6da68e7ba67a1f9118c0f7f43c9",
+      "txHash": "0x88417356623623567e7d7b280754f3c4e324867e83e4a51cb610babf6b7785e4",
       "layout": {
         "storage": [
           {
@@ -156,6 +156,42 @@
             "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:31"
           },
           {
+            "contract": "ERC20Upgradeable",
+            "label": "_balances",
+            "type": "t_mapping(t_address,t_uint256)",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol:35"
+          },
+          {
+            "contract": "ERC20Upgradeable",
+            "label": "_allowances",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol:37"
+          },
+          {
+            "contract": "ERC20Upgradeable",
+            "label": "_totalSupply",
+            "type": "t_uint256",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol:39"
+          },
+          {
+            "contract": "ERC20Upgradeable",
+            "label": "_name",
+            "type": "t_string_storage",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol:41"
+          },
+          {
+            "contract": "ERC20Upgradeable",
+            "label": "_symbol",
+            "type": "t_string_storage",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol:42"
+          },
+          {
+            "contract": "ERC20Upgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)45_storage",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol:310"
+          },
+          {
             "contract": "OwnableUpgradeable",
             "label": "_owner",
             "type": "t_address",
@@ -168,81 +204,39 @@
             "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:74"
           },
           {
-            "contract": "RevenueController",
-            "label": "nextFundIndex",
-            "type": "t_uint256",
-            "src": "contracts/RevenueController.sol:21"
-          },
-          {
-            "contract": "RevenueController",
+            "contract": "XTKManagementStakingModule",
             "label": "xtk",
             "type": "t_address",
-            "src": "contracts/RevenueController.sol:24"
+            "src": "contracts/XTKManagementStakingModule.sol:17"
           },
           {
-            "contract": "RevenueController",
-            "label": "managementStakingModule",
-            "type": "t_address",
-            "src": "contracts/RevenueController.sol:26"
-          },
-          {
-            "contract": "RevenueController",
-            "label": "oneInchExchange",
-            "type": "t_address",
-            "src": "contracts/RevenueController.sol:28"
-          },
-          {
-            "contract": "RevenueController",
-            "label": "manager",
-            "type": "t_address",
-            "src": "contracts/RevenueController.sol:33"
-          },
-          {
-            "contract": "RevenueController",
-            "label": "manager2",
-            "type": "t_address",
-            "src": "contracts/RevenueController.sol:34"
-          },
-          {
-            "contract": "RevenueController",
-            "label": "_fundToIndex",
-            "type": "t_mapping(t_address,t_uint256)",
-            "src": "contracts/RevenueController.sol:37"
-          },
-          {
-            "contract": "RevenueController",
-            "label": "_fundAssets",
-            "type": "t_mapping(t_address,t_array(t_address)dyn_storage)",
-            "src": "contracts/RevenueController.sol:39"
-          },
-          {
-            "contract": "RevenueController",
-            "label": "_indexToFund",
-            "type": "t_mapping(t_uint256,t_address)",
-            "src": "contracts/RevenueController.sol:41"
+            "contract": "XTKManagementStakingModule",
+            "label": "unstakePenalty",
+            "type": "t_uint256",
+            "src": "contracts/XTKManagementStakingModule.sol:20"
           }
         ],
         "types": {
+          "t_address": {
+            "label": "address"
+          },
           "t_uint256": {
             "label": "uint256"
           },
-          "t_address": {
-            "label": "address"
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
           },
           "t_mapping(t_address,t_uint256)": {
             "label": "mapping(address => uint256)"
           },
-          "t_mapping(t_address,t_array(t_address)dyn_storage)": {
-            "label": "mapping(address => address[])"
+          "t_mapping(t_address,t_mapping(t_address,t_uint256))": {
+            "label": "mapping(address => mapping(address => uint256))"
           },
-          "t_array(t_address)dyn_storage": {
-            "label": "address[]"
+          "t_string_storage": {
+            "label": "string"
           },
-          "t_mapping(t_uint256,t_address)": {
-            "label": "mapping(uint256 => address)"
-          },
-          "t_array(t_uint256)49_storage": {
-            "label": "uint256[49]"
+          "t_array(t_uint256)45_storage": {
+            "label": "uint256[45]"
           },
           "t_array(t_uint256)50_storage": {
             "label": "uint256[50]"
