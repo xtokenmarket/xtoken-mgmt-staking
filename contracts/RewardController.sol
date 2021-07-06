@@ -58,7 +58,7 @@ contract RewardController is Initializable, OwnableUpgradeable {
     function initRewardDurationAndAmount(uint256 _rewardDuration, uint256 _rewardPeriodAmount) external onlyOwner {
         require(block.timestamp >= periodFinish, "Cannot initiate period while reward ongoing");
         require(_rewardDuration > 0, "Invalid reward duration");
-        require(_rewardPeriodAmount > 0, "Invalid reward duration");
+        require(_rewardPeriodAmount > 0, "Invalid reward amount");
 
         rewardRate = _rewardPeriodAmount / _rewardDuration;
         require(rewardRate > 0, "Invalid reward rate");
