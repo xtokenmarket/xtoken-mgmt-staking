@@ -89,24 +89,12 @@ contract RevenueController is Initializable, OwnableUpgradeable {
 
         IxAsset(fund).withdrawFees();
 
-
         for (uint256 i = 0; i < fundAssets.length; i++) {
             uint256 revenueTokenBalance = getRevenueTokenBalance(fundAssets[i]);
 
             if (revenueTokenBalance > 0) {
-                bool success;
-
-                if (fundAssets[i] == ETH_ADDRESS) {
-                    // execute 1inch swap of ETH for XTK
-                    (success, ) = oneInchExchange.call{ value: revenueTokenBalance }(_oneInchData[i]);
-                } else {
-                    // execute 1inch swap of token for XTK
-                    (success, ) = oneInchExchange.call(_oneInchData[i]);
-                }
-
-                require(success, "Low-level call with value failed");
-
                 emit FeesClaimed(fund, fundAssets[i], revenueTokenBalance);
+                swapAssetToXtk(fundAssets[i], _oneInchData[i]);
             }
         }
 
@@ -114,6 +102,42 @@ contract RevenueController is Initializable, OwnableUpgradeable {
         IERC20(xtk).transfer(managementStakingModule, xtkBalance);
 
         emit RevenueAccrued(fund, xtkBalance, block.timestamp);
+    }
+
+    function swapOnceClaimed(
+        uint256 _fundIndex,
+        uint256 _fundAssetIndex,
+        bytes memory _oneInchData
+    ) external onlyOwnerOrManager {
+        require(_fundIndex > 0 && _fundIndex < nextFundIndex, "Invalid fund index");
+
+        address fund = _indexToFund[_fundIndex];
+        address[] memory fundAssets = _fundAssets[fund];
+
+        require(_fundAssetIndex < fundAssets.length, "Invalid fund asset index");
+
+        swapAssetToXtk(fundAssets[_fundAssetIndex], _oneInchData);
+
+        uint256 xtkBalance = IERC20(xtk).balanceOf(address(this));
+        IERC20(xtk).transfer(managementStakingModule, xtkBalance);
+
+        emit RevenueAccrued(fund, xtkBalance, block.timestamp);
+    }
+
+    function swapAssetToXtk(address _fundAsset, bytes memory _oneInchData) private {
+        uint256 revenueTokenBalance = getRevenueTokenBalance(_fundAsset);
+
+        bool success;
+
+        if (_fundAsset == ETH_ADDRESS) {
+            // execute 1inch swap of ETH for XTK
+            (success, ) = oneInchExchange.call{ value: revenueTokenBalance }(_oneInchData);
+        } else {
+            // execute 1inch swap of token for XTK
+            (success, ) = oneInchExchange.call(_oneInchData);
+        }
+
+        require(success, "Low-level call with value failed");
     }
 
     /**
@@ -129,8 +153,8 @@ contract RevenueController is Initializable, OwnableUpgradeable {
         _fundToIndex[_fund] = nextFundIndex++;
         _fundAssets[_fund] = _assets;
 
-        for(uint256 i = 0; i < _assets.length; ++i) {
-            if(_assets[i] != ETH_ADDRESS) {
+        for (uint256 i = 0; i < _assets.length; ++i) {
+            if (_assets[i] != ETH_ADDRESS) {
                 IERC20(_assets[i]).approve(oneInchExchange, type(uint256).max);
             }
         }
@@ -173,7 +197,6 @@ contract RevenueController is Initializable, OwnableUpgradeable {
     function getFundAssets(address _fund) public view returns (address[] memory) {
         return _fundAssets[_fund];
     }
-
 
     /* ============ Fallbacks ============ */
 
