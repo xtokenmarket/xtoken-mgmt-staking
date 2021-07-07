@@ -19,6 +19,8 @@ contract XTKManagementStakingModule is Initializable, ERC20Upgradeable, OwnableU
     // Unstake penalty percentage between 0 and 10%
     uint256 public unstakePenalty;
 
+    bool public transferable;
+
     uint256 private constant DEC_18 = 1e18;
     uint256 private constant INITIAL_SUPPLY_MULTIPLIER = 10;
 
@@ -34,10 +36,33 @@ contract XTKManagementStakingModule is Initializable, ERC20Upgradeable, OwnableU
         __Ownable_init();
         __ERC20_init_unchained("xXTK-Mgmt", "xXTKa");
 
+        transferable = true;
         xtk = _xtk;
 
         // transfer ownership to the governance
         transferOwnership(_govOps);
+    }
+
+    /**
+     * @dev See {ERC20-_beforeTokenTransfer}.
+     * Check if transferable
+     */
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 amount
+    ) internal virtual override {
+        super._beforeTokenTransfer(from, to, amount);
+
+        require(transferable, "token not transferable");
+    }
+
+    /**
+     * Governance function that allow/disallow xXTK token transfer
+     */
+    function setTransferable(bool _transferable) external onlyOwner {
+        require(transferable != _transferable, "Same value");
+        transferable = _transferable;
     }
 
     /**
