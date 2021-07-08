@@ -90,7 +90,7 @@ contract RevenueController is Initializable, OwnableUpgradeable {
 
             if (revenueTokenBalance > 0) {
                 emit FeesClaimed(fund, fundAssets[i], revenueTokenBalance);
-                if(_oneInchData[i].length > 0) {
+                if (_oneInchData[i].length > 0) {
                     swapAssetToXtk(fundAssets[i], _oneInchData[i]);
                 }
             }

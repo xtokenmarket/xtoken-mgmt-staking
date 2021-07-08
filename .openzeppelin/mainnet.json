@@ -7,7 +7,7 @@
       "hash": "0x7c6ad926912922e498288e90617fe092ee84f93022e15d371b2f9305f59df7ef",
       "type": 0,
       "accessList": null,
-      "blockHash": "0x784df6494e138e00eb34e3d1ca8b3a647c0d55fbdd0a0fa4b70db5e9cc797028",
+      "blockHash": "0xbae14071397d7f0d6522039e7b9d908c1795332937d141220cb177b49043e574",
       "blockNumber": 12787570,
       "transactionIndex": 0,
       "confirmations": 1,
@@ -42,7 +42,7 @@
     },
     {
       "address": "0xd9F9304329451Dd31908BC61C0F87e2AA90aacD6",
-      "txHash": "0x53aa9c9922be4d4881d65e5098321d5c07928c0bf379d5ce3df0092099a30979",
+      "txHash": "0xe05cd916452c2f036994bb2e52184d0aa4a7f6bb6fa20606dbebaa71aa894cff",
       "kind": "transparent"
     }
   ],
@@ -132,9 +132,9 @@
         }
       }
     },
-    "57b6c12e17f5dcab7aa035fd3fc7037e82e6fab9566ccbbf016373836c57a662": {
+    "8b9aff854ba3750955ca74cdf59982844c53b9faf2e03caf045f68c0da63c057": {
       "address": "0xF5aA8e3C6BA1EdF766E197a0bCD5844Fd1ed8A27",
-      "txHash": "0x623bff09b25363ecb3049e4c26319d640c6b9df1398579e102899f09a431b559",
+      "txHash": "0x61a73ab89f4525cc5ee27f153a1edb488499d601034df3a549632aeec7aeaafd",
       "layout": {
         "storage": [
           {
@@ -156,6 +156,42 @@
             "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:31"
           },
           {
+            "contract": "ERC20Upgradeable",
+            "label": "_balances",
+            "type": "t_mapping(t_address,t_uint256)",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol:35"
+          },
+          {
+            "contract": "ERC20Upgradeable",
+            "label": "_allowances",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol:37"
+          },
+          {
+            "contract": "ERC20Upgradeable",
+            "label": "_totalSupply",
+            "type": "t_uint256",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol:39"
+          },
+          {
+            "contract": "ERC20Upgradeable",
+            "label": "_name",
+            "type": "t_string_storage",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol:41"
+          },
+          {
+            "contract": "ERC20Upgradeable",
+            "label": "_symbol",
+            "type": "t_string_storage",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol:42"
+          },
+          {
+            "contract": "ERC20Upgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)45_storage",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol:310"
+          },
+          {
             "contract": "OwnableUpgradeable",
             "label": "_owner",
             "type": "t_address",
@@ -168,87 +204,51 @@
             "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:74"
           },
           {
-            "contract": "RevenueController",
-            "label": "nextFundIndex",
-            "type": "t_uint256",
-            "src": "contracts/RevenueController.sol:21"
-          },
-          {
-            "contract": "RevenueController",
+            "contract": "XTKManagementStakingModule",
             "label": "xtk",
             "type": "t_address",
-            "src": "contracts/RevenueController.sol:24"
+            "src": "contracts/XTKManagementStakingModule.sol:17"
           },
           {
-            "contract": "RevenueController",
-            "label": "managementStakingModule",
-            "type": "t_address",
-            "src": "contracts/RevenueController.sol:26"
+            "contract": "XTKManagementStakingModule",
+            "label": "unstakePenalty",
+            "type": "t_uint256",
+            "src": "contracts/XTKManagementStakingModule.sol:20"
           },
           {
-            "contract": "RevenueController",
-            "label": "oneInchExchange",
-            "type": "t_address",
-            "src": "contracts/RevenueController.sol:28"
-          },
-          {
-            "contract": "RevenueController",
-            "label": "manager",
-            "type": "t_address",
-            "src": "contracts/RevenueController.sol:33"
-          },
-          {
-            "contract": "RevenueController",
-            "label": "manager2",
-            "type": "t_address",
-            "src": "contracts/RevenueController.sol:34"
-          },
-          {
-            "contract": "RevenueController",
-            "label": "_fundToIndex",
-            "type": "t_mapping(t_address,t_uint256)",
-            "src": "contracts/RevenueController.sol:37"
-          },
-          {
-            "contract": "RevenueController",
-            "label": "_fundAssets",
-            "type": "t_mapping(t_address,t_array(t_address)dyn_storage)",
-            "src": "contracts/RevenueController.sol:39"
-          },
-          {
-            "contract": "RevenueController",
-            "label": "_indexToFund",
-            "type": "t_mapping(t_uint256,t_address)",
-            "src": "contracts/RevenueController.sol:41"
+            "contract": "XTKManagementStakingModule",
+            "label": "transferable",
+            "type": "t_bool",
+            "src": "contracts/XTKManagementStakingModule.sol:22"
           }
         ],
         "types": {
-          "t_uint256": {
-            "label": "uint256"
-          },
           "t_address": {
             "label": "address"
           },
-          "t_mapping(t_address,t_uint256)": {
-            "label": "mapping(address => uint256)"
+          "t_uint256": {
+            "label": "uint256"
           },
-          "t_mapping(t_address,t_array(t_address)dyn_storage)": {
-            "label": "mapping(address => address[])"
-          },
-          "t_array(t_address)dyn_storage": {
-            "label": "address[]"
-          },
-          "t_mapping(t_uint256,t_address)": {
-            "label": "mapping(uint256 => address)"
+          "t_bool": {
+            "label": "bool"
           },
           "t_array(t_uint256)49_storage": {
             "label": "uint256[49]"
           },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)"
+          },
+          "t_mapping(t_address,t_mapping(t_address,t_uint256))": {
+            "label": "mapping(address => mapping(address => uint256))"
+          },
+          "t_string_storage": {
+            "label": "string"
+          },
+          "t_array(t_uint256)45_storage": {
+            "label": "uint256[45]"
+          },
           "t_array(t_uint256)50_storage": {
             "label": "uint256[50]"
-          },
-          "t_bool": {
-            "label": "bool"
           }
         }
       }
