@@ -36,18 +36,11 @@ contract RewardController is Initializable, OwnableUpgradeable {
 
     /* ============ Functions ============ */
 
-    function initialize(
-        address _xtk,
-        address _managementStakingModule,
-        address _govOps
-    ) public initializer {
+    function initialize(address _xtk, address _managementStakingModule) public initializer {
         __Ownable_init();
 
         xtk = _xtk;
         managementStakingModule = _managementStakingModule;
-
-        // transfer ownership to the governance
-        transferOwnership(_govOps);
     }
 
     /**

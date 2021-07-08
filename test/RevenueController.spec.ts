@@ -13,7 +13,6 @@ describe("RevenueController Test", () => {
   let deployer: SignerWithAddress;
   let manager: SignerWithAddress;
   let manager2: SignerWithAddress;
-  let govOps: SignerWithAddress;
   let xTokenDeployer: Signer;
 
   let revenueController: RevenueController;
@@ -40,19 +39,18 @@ describe("RevenueController Test", () => {
 
     deployer = signers[0];
     mgmt = signers[1].address;
-    govOps = signers[2];
     manager = signers[3];
     manager2 = signers[4];
 
     // deploy and initialize
     const revenueControllerArtifact = await ethers.getContractFactory("RevenueController");
     revenueController = <RevenueController>(
-      await upgrades.deployProxy(revenueControllerArtifact, [xtkAddress, mgmt, oneInchV3, govOps.address])
+      await upgrades.deployProxy(revenueControllerArtifact, [xtkAddress, mgmt, oneInchV3])
     );
 
     // set managers by govOps
-    await revenueController.connect(govOps).setManager(manager.address);
-    await revenueController.connect(govOps).setManager2(manager2.address);
+    await revenueController.connect(deployer).setManager(manager.address);
+    await revenueController.connect(deployer).setManager2(manager2.address);
 
     // xToken: transfer ownership from deploy to the RevenueController
     await unlockAccount(xTokenDeployerAddress);
@@ -73,7 +71,7 @@ describe("RevenueController Test", () => {
 
   describe("owner functions", async () => {
     before(async () => {
-      revenueController = revenueController.connect(govOps);
+      revenueController = revenueController.connect(deployer);
     });
     beforeEach(async () => {});
 

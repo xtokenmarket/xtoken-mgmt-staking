@@ -58,8 +58,7 @@ contract RevenueController is Initializable, OwnableUpgradeable {
     function initialize(
         address _xtk,
         address _managementStakingModule,
-        address _oneInchExchange,
-        address _govOps
+        address _oneInchExchange
     ) external initializer {
         __Ownable_init();
 
@@ -68,9 +67,6 @@ contract RevenueController is Initializable, OwnableUpgradeable {
         xtk = _xtk;
         managementStakingModule = _managementStakingModule;
         oneInchExchange = _oneInchExchange;
-
-        // transfer ownership to the governance
-        transferOwnership(_govOps);
     }
 
     /**

@@ -10,7 +10,6 @@ import { unlockAccount, increaseTime, getTimeStamp, ZERO, ether } from "./utils"
 
 describe("RewardController Test", () => {
   let deployer: SignerWithAddress;
-  let govOps: SignerWithAddress;
 
   let rewardController: RewardController;
   let mgmt: string;
@@ -24,12 +23,9 @@ describe("RewardController Test", () => {
 
     deployer = signers[0];
     mgmt = signers[1].address;
-    govOps = signers[2];
 
     const rewardControllerArtifact = await ethers.getContractFactory("RewardController");
-    rewardController = <RewardController>(
-      await upgrades.deployProxy(rewardControllerArtifact, [xtkAddress, mgmt, govOps.address])
-    );
+    rewardController = <RewardController>await upgrades.deployProxy(rewardControllerArtifact, [xtkAddress, mgmt]);
 
     await unlockAccount("0xA0b5Eb5464fE4C5F4334a80267E784A961fdD865");
     whale = await ethers.provider.getSigner("0xA0b5Eb5464fE4C5F4334a80267E784A961fdD865");
@@ -57,7 +53,7 @@ describe("RewardController Test", () => {
     });
 
     async function subject(): Promise<any> {
-      await rewardController.connect(govOps).initRewardDurationAndAmount(rewardDuration, rewardPeriodAmount);
+      await rewardController.connect(deployer).initRewardDurationAndAmount(rewardDuration, rewardPeriodAmount);
     }
 
     it("should revert when rewardDuration = 0", async () => {

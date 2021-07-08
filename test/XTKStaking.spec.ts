@@ -10,7 +10,6 @@ import { unlockAccount, ether } from "./utils";
 
 describe("XTKManagementStakingModule Test", () => {
   let deployer: SignerWithAddress;
-  let govOps: SignerWithAddress;
   let alice: SignerWithAddress;
   let bob: SignerWithAddress;
 
@@ -26,14 +25,11 @@ describe("XTKManagementStakingModule Test", () => {
     const signers: SignerWithAddress[] = await hre.ethers.getSigners();
 
     deployer = signers[0];
-    govOps = signers[1];
     alice = signers[2];
     bob = signers[3];
 
     const rewardControllerArtifact = await ethers.getContractFactory("XTKManagementStakingModule");
-    stakingModule = <XTKManagementStakingModule>(
-      await upgrades.deployProxy(rewardControllerArtifact, [xtkAddress, govOps.address])
-    );
+    stakingModule = <XTKManagementStakingModule>await upgrades.deployProxy(rewardControllerArtifact, [xtkAddress]);
 
     await unlockAccount("0xA0b5Eb5464fE4C5F4334a80267E784A961fdD865");
     whale = await ethers.provider.getSigner("0xA0b5Eb5464fE4C5F4334a80267E784A961fdD865");
@@ -58,23 +54,23 @@ describe("XTKManagementStakingModule Test", () => {
 
   describe("setUnstakePenalty", async () => {
     it("should revert from random address", async () => {
-      await expect(stakingModule.connect(deployer).setUnstakePenalty(ether(1))).to.be.revertedWith("");
+      await expect(stakingModule.connect(alice).setUnstakePenalty(ether(1))).to.be.revertedWith("");
     });
 
     it("should revert when > 1e18", async () => {
-      await expect(stakingModule.connect(govOps).setUnstakePenalty(ether(2))).to.be.revertedWith(
+      await expect(stakingModule.connect(deployer).setUnstakePenalty(ether(2))).to.be.revertedWith(
         "Penalty outside range",
       );
     });
 
     it("should revert when < 1e17", async () => {
-      await expect(stakingModule.connect(govOps).setUnstakePenalty(ether(1).div(10))).to.be.revertedWith(
+      await expect(stakingModule.connect(deployer).setUnstakePenalty(ether(1).div(10))).to.be.revertedWith(
         "Penalty outside range",
       );
     });
 
     it("should success with 9.5e17", async () => {
-      await stakingModule.connect(govOps).setUnstakePenalty(penalty);
+      await stakingModule.connect(deployer).setUnstakePenalty(penalty);
       expect(await stakingModule.unstakePenalty()).to.equal(penalty);
     });
   });

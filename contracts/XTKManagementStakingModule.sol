@@ -32,15 +32,12 @@ contract XTKManagementStakingModule is Initializable, ERC20Upgradeable, OwnableU
 
     /* ============ Functions ============ */
 
-    function initialize(address _xtk, address _govOps) public initializer {
+    function initialize(address _xtk) public initializer {
         __Ownable_init();
         __ERC20_init_unchained("xXTK-Mgmt", "xXTKa");
 
         transferable = true;
         xtk = _xtk;
-
-        // transfer ownership to the governance
-        transferOwnership(_govOps);
     }
 
     /**
