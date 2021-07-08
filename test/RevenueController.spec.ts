@@ -7,7 +7,7 @@ import { expect } from "chai";
 import axios from "axios";
 
 import { unlockAccount, getSnapShot, revertEvm, ZERO } from "./utils";
-import { RevenueController, IxAsset, IERC20 } from "../typechain";
+import { RevenueController, IxAsset, IERC20, IxAAVE, IxINCH } from "../typechain";
 
 describe("RevenueController Test", () => {
   let deployer: SignerWithAddress;
@@ -16,8 +16,8 @@ describe("RevenueController Test", () => {
   let xTokenDeployer: Signer;
 
   let revenueController: RevenueController;
-  let xAAVEa: IxAsset;
-  let xINCHa: IxAsset;
+  let xAAVEa: IxAAVE;
+  let xINCHa: IxINCH;
   let aave: IERC20;
   let inch: IERC20;
   let xtk: IERC20;
@@ -56,9 +56,10 @@ describe("RevenueController Test", () => {
     await unlockAccount(xTokenDeployerAddress);
     xTokenDeployer = await ethers.provider.getSigner(xTokenDeployerAddress);
 
-    const xAssetArtifacts: Artifact = await hre.artifacts.readArtifact("IxAsset");
-    xAAVEa = <IxAsset>await ethers.getContractAt(xAssetArtifacts.abi, xAAVEaAddress);
-    xINCHa = <IxAsset>await ethers.getContractAt(xAssetArtifacts.abi, xINCHaAddress);
+    const xAaveArtifacts: Artifact = await hre.artifacts.readArtifact("IxAAVE");
+    xAAVEa = <IxAAVE>await ethers.getContractAt(xAaveArtifacts.abi, xAAVEaAddress);
+    const xInchArtifacts: Artifact = await hre.artifacts.readArtifact("IxINCH");
+    xINCHa = <IxINCH>await ethers.getContractAt(xInchArtifacts.abi, xINCHaAddress);
 
     await xAAVEa.connect(xTokenDeployer).transferOwnership(revenueController.address);
     await xINCHa.connect(xTokenDeployer).transferOwnership(revenueController.address);
@@ -112,13 +113,10 @@ describe("RevenueController Test", () => {
     });
 
     async function subject(): Promise<any> {
-      feeBalance = await fundAsset.balanceOf(xAsset.address);
       fundIndex = await revenueController.getFundIndex(xAsset.address);
       apiUrl = `https://api.1inch.exchange/v3.0/1/swap?fromTokenAddress=${fundAsset.address}&toTokenAddress=${
         xtk.address
-      }&amount=${feeBalance.mul(98).div(100).toString()}&fromAddress=${
-        revenueController.address
-      }&slippage=1&disableEstimate=true`;
+      }&amount=${feeBalance.toString()}&fromAddress=${revenueController.address}&slippage=1&disableEstimate=true`;
       const response = await axios.get(apiUrl);
       const calldata = response.data.tx.data;
       await revenueController.connect(manager).claimAndSwap(fundIndex, [calldata]);
@@ -127,15 +125,65 @@ describe("RevenueController Test", () => {
     it("claimAndSwap from xAAVEa", async () => {
       xAsset = xAAVEa;
       fundAsset = aave;
+      feeBalance = await xAAVEa.withdrawableAaveFees();
       await subject();
-      expect(await fundAsset.balanceOf(xAsset.address)).to.equal(ZERO);
+      expect(await xAAVEa.withdrawableAaveFees()).to.equal(ZERO);
     });
 
-    it("claimAndSwap from xINCHa", async () => {
+    // it("claimAndSwap from xINCHa", async () => {
+    //   xAsset = xINCHa;
+    //   fundAsset = inch;
+    //   feeBalance = await xINCHa.withdrawableOneInchFees();
+    //   await subject();
+    //   expect(await xINCHa.withdrawableOneInchFees()).to.equal(ZERO);
+    // });
+  });
+
+  describe("swapOnceClaimed", async () => {
+    let feeBalance: BigNumber;
+    let fundIndex: BigNumber;
+    let apiUrl: string;
+    let xAsset: IxAsset;
+    let fundAsset: IERC20;
+
+    let snapshotID: any;
+
+    beforeEach(async () => {
+      snapshotID = await getSnapShot();
+    });
+
+    afterEach(async () => {
+      await revertEvm(snapshotID);
+    });
+
+    async function subject(): Promise<any> {
+      fundIndex = await revenueController.getFundIndex(xAsset.address);
+      apiUrl = `https://api.1inch.exchange/v3.0/1/swap?fromTokenAddress=${fundAsset.address}&toTokenAddress=${
+        xtk.address
+      }&amount=${feeBalance.toString()}&fromAddress=${revenueController.address}&slippage=1&disableEstimate=true`;
+      const response = await axios.get(apiUrl);
+      const calldata = response.data.tx.data;
+      await revenueController.connect(manager).claimAndSwap(fundIndex, [calldata]);
+    }
+
+    it("claimAndSwap from xINCHa and swapOnceClaimed", async () => {
       xAsset = xINCHa;
       fundAsset = inch;
-      await subject();
-      expect(await fundAsset.balanceOf(xAsset.address)).to.equal(ZERO);
+      feeBalance = await xINCHa.withdrawableOneInchFees();
+
+      fundIndex = await revenueController.getFundIndex(xAsset.address);
+      apiUrl = `https://api.1inch.exchange/v3.0/1/swap?fromTokenAddress=${fundAsset.address}&toTokenAddress=${
+        xtk.address
+      }&amount=${feeBalance.toString()}&fromAddress=${revenueController.address}&slippage=1&disableEstimate=true`;
+      const response = await axios.get(apiUrl);
+      const calldata = response.data.tx.data;
+
+      await revenueController.connect(manager).claimAndSwap(fundIndex, [[]]);
+
+      expect(await xINCHa.withdrawableOneInchFees()).to.equal(ZERO);
+      expect(await inch.balanceOf(revenueController.address)).to.equal(feeBalance);
+
+      await revenueController.connect(manager).swapOnceClaimed(fundIndex, 0, calldata);
     });
   });
 });
