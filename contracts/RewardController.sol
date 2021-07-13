@@ -1,6 +1,7 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
@@ -15,6 +16,8 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
  * last call. This function transfers the XTK from the RewardController to the staking module.
  */
 contract RewardController is Initializable, OwnableUpgradeable {
+    using SafeERC20 for IERC20;
+
     /* ============ State Variables ============ */
 
     // End time of the active period
@@ -74,7 +77,7 @@ contract RewardController is Initializable, OwnableUpgradeable {
         require(releasableReward > 0, "Releasable reward is zero");
 
         lastUpdateTime = block.timestamp;
-        IERC20(xtk).transfer(managementStakingModule, releasableReward);
+        IERC20(xtk).safeTransfer(managementStakingModule, releasableReward);
 
         emit RewardReleased(block.timestamp, releasableReward);
     }

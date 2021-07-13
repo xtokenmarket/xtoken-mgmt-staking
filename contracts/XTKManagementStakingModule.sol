@@ -1,6 +1,7 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
@@ -11,6 +12,8 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
  *
  */
 contract XTKManagementStakingModule is Initializable, ERC20Upgradeable, OwnableUpgradeable {
+    using SafeERC20 for IERC20;
+
     /* ============ State Variables ============ */
 
     // Address of xtk token
@@ -85,7 +88,7 @@ contract XTKManagementStakingModule is Initializable, ERC20Upgradeable, OwnableU
 
         uint256 mintAmount = calculateXxtkAmountToMint(_xtkAmount);
 
-        IERC20(xtk).transferFrom(msg.sender, address(this), _xtkAmount);
+        IERC20(xtk).safeTransferFrom(msg.sender, address(this), _xtkAmount);
 
         _mint(msg.sender, mintAmount);
 
@@ -103,7 +106,7 @@ contract XTKManagementStakingModule is Initializable, ERC20Upgradeable, OwnableU
 
         _burn(msg.sender, _xxtkAmount);
 
-        IERC20(xtk).transfer(msg.sender, xtkToDistribute);
+        IERC20(xtk).safeTransfer(msg.sender, xtkToDistribute);
 
         emit UnStake(msg.sender, _xxtkAmount, xtkToDistribute);
     }

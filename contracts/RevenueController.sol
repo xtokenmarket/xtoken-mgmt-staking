@@ -1,6 +1,7 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
@@ -15,6 +16,8 @@ import "./interface/IxAsset.sol";
  * be passed to permissioned function `claimAndSwap`), and then transfers XTK to Mgmt module
  */
 contract RevenueController is Initializable, OwnableUpgradeable {
+    using SafeERC20 for IERC20;
+
     /* ============ State Variables ============ */
 
     // Index of xAsset
@@ -97,7 +100,7 @@ contract RevenueController is Initializable, OwnableUpgradeable {
         }
 
         uint256 xtkBalance = IERC20(xtk).balanceOf(address(this));
-        IERC20(xtk).transfer(managementStakingModule, xtkBalance);
+        IERC20(xtk).safeTransfer(managementStakingModule, xtkBalance);
 
         emit RevenueAccrued(fund, xtkBalance, block.timestamp);
     }
@@ -117,7 +120,7 @@ contract RevenueController is Initializable, OwnableUpgradeable {
         swapAssetToXtk(fundAssets[_fundAssetIndex], _oneInchData);
 
         uint256 xtkBalance = IERC20(xtk).balanceOf(address(this));
-        IERC20(xtk).transfer(managementStakingModule, xtkBalance);
+        IERC20(xtk).safeTransfer(managementStakingModule, xtkBalance);
 
         emit RevenueAccrued(fund, xtkBalance, block.timestamp);
     }
@@ -153,7 +156,7 @@ contract RevenueController is Initializable, OwnableUpgradeable {
 
         for (uint256 i = 0; i < _assets.length; ++i) {
             if (_assets[i] != ETH_ADDRESS) {
-                IERC20(_assets[i]).approve(oneInchExchange, type(uint256).max);
+                IERC20(_assets[i]).safeApprove(oneInchExchange, type(uint256).max);
             }
         }
 
