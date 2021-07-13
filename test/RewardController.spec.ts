@@ -66,9 +66,9 @@ describe("RewardController Test", () => {
       await expect(subject()).to.be.revertedWith("Invalid reward amount");
     });
 
-    it("should revert when rewardPeriodAmount = 0", async () => {
+    it("should revert when remainder exits = 0", async () => {
       rewardPeriodAmount = BigNumber.from(10);
-      await expect(subject()).to.be.revertedWith("Invalid reward rate");
+      await expect(subject()).to.be.revertedWith("Amount not multiple of duration");
     });
 
     it("should revert when exceeds balance", async () => {

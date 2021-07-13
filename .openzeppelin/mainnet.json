@@ -7,7 +7,7 @@
       "hash": "0x7c6ad926912922e498288e90617fe092ee84f93022e15d371b2f9305f59df7ef",
       "type": 0,
       "accessList": null,
-      "blockHash": "0xbae14071397d7f0d6522039e7b9d908c1795332937d141220cb177b49043e574",
+      "blockHash": "0x7e16eeb6d8478d0590bb7aba07aff130d63c91a85e9daf07f2e3f1d3d418cf2b",
       "blockNumber": 12787570,
       "transactionIndex": 0,
       "confirmations": 1,
@@ -37,7 +37,12 @@
   "proxies": [
     {
       "address": "0x4A84ECFD55FdD6A05d6AF7a08e3854668EA4E657",
-      "txHash": "0x1e1d788fc5f4e7d99761bc83c987be55bfb76a1cd522470f0292d040839f8b25",
+      "txHash": "0xa80622d821e00fdf7fd9d4e86606d026a8d986fdb68caa072d61f8d2e34b0857",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xa3b67474A27Ba4bb28eE22e5f1C4529c07A45287",
+      "txHash": "0xc2646267a2e788cda8f0c1a932258e97aa4c2125d210265672feb2052a96a0b9",
       "kind": "transparent"
     },
     {
@@ -47,9 +52,130 @@
     }
   ],
   "impls": {
-    "8eebd2239dbf0c4bc6b9fa42e0e7241703d40fde5b87eb92110b964655c43154": {
+    "57b6c12e17f5dcab7aa035fd3fc7037e82e6fab9566ccbbf016373836c57a662": {
       "address": "0x5A3Deb79F213F5d4C2702fC75eDfa41F46B5E271",
-      "txHash": "0x5f04eb5389083e8f1293b6dccd465f5dce52a93093e65df25fe1feb2c17181e8",
+      "txHash": "0x8b06d8a8a46b0c046a60b31d25ebed69683789b02fe2f1fb5fe4d87a709ac7c5",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:23"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:28"
+          },
+          {
+            "contract": "ContextUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:31"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:20"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:74"
+          },
+          {
+            "contract": "RevenueController",
+            "label": "nextFundIndex",
+            "type": "t_uint256",
+            "src": "contracts/RevenueController.sol:21"
+          },
+          {
+            "contract": "RevenueController",
+            "label": "xtk",
+            "type": "t_address",
+            "src": "contracts/RevenueController.sol:24"
+          },
+          {
+            "contract": "RevenueController",
+            "label": "managementStakingModule",
+            "type": "t_address",
+            "src": "contracts/RevenueController.sol:26"
+          },
+          {
+            "contract": "RevenueController",
+            "label": "oneInchExchange",
+            "type": "t_address",
+            "src": "contracts/RevenueController.sol:28"
+          },
+          {
+            "contract": "RevenueController",
+            "label": "manager",
+            "type": "t_address",
+            "src": "contracts/RevenueController.sol:33"
+          },
+          {
+            "contract": "RevenueController",
+            "label": "manager2",
+            "type": "t_address",
+            "src": "contracts/RevenueController.sol:34"
+          },
+          {
+            "contract": "RevenueController",
+            "label": "_fundToIndex",
+            "type": "t_mapping(t_address,t_uint256)",
+            "src": "contracts/RevenueController.sol:37"
+          },
+          {
+            "contract": "RevenueController",
+            "label": "_fundAssets",
+            "type": "t_mapping(t_address,t_array(t_address)dyn_storage)",
+            "src": "contracts/RevenueController.sol:39"
+          },
+          {
+            "contract": "RevenueController",
+            "label": "_indexToFund",
+            "type": "t_mapping(t_uint256,t_address)",
+            "src": "contracts/RevenueController.sol:41"
+          }
+        ],
+        "types": {
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)"
+          },
+          "t_mapping(t_address,t_array(t_address)dyn_storage)": {
+            "label": "mapping(address => address[])"
+          },
+          "t_array(t_address)dyn_storage": {
+            "label": "address[]"
+          },
+          "t_mapping(t_uint256,t_address)": {
+            "label": "mapping(uint256 => address)"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          },
+          "t_bool": {
+            "label": "bool"
+          }
+        }
+      }
+    },
+    "cd0ff467cc8356bfef05dc82ba81fa5527e5f4b8c045757a52060e64fbc7e984": {
+      "address": "0x9d3EF6A5D9ae42AA53A1EA2b60A81768D09B1E44",
+      "txHash": "0x8f4d897cf115b77c39f4fe9e958f2d2200fec13458a0f8ad0195e70e546c3dfc",
       "layout": {
         "storage": [
           {
@@ -132,9 +258,9 @@
         }
       }
     },
-    "8b9aff854ba3750955ca74cdf59982844c53b9faf2e03caf045f68c0da63c057": {
+    "58e3baedc5db8218e10dc469b51cf2df8509d8a0111131d4dc790320d5ff91d7": {
       "address": "0xF5aA8e3C6BA1EdF766E197a0bCD5844Fd1ed8A27",
-      "txHash": "0x61a73ab89f4525cc5ee27f153a1edb488499d601034df3a549632aeec7aeaafd",
+      "txHash": "0xf45847ec17b8e895b5676e4267a4da4182248487b1a652f11892feda15d8d1d3",
       "layout": {
         "storage": [
           {
@@ -207,19 +333,19 @@
             "contract": "XTKManagementStakingModule",
             "label": "xtk",
             "type": "t_address",
-            "src": "contracts/XTKManagementStakingModule.sol:17"
+            "src": "contracts/XTKManagementStakingModule.sol:20"
           },
           {
             "contract": "XTKManagementStakingModule",
             "label": "unstakePenalty",
             "type": "t_uint256",
-            "src": "contracts/XTKManagementStakingModule.sol:20"
+            "src": "contracts/XTKManagementStakingModule.sol:23"
           },
           {
             "contract": "XTKManagementStakingModule",
             "label": "transferable",
             "type": "t_bool",
-            "src": "contracts/XTKManagementStakingModule.sol:22"
+            "src": "contracts/XTKManagementStakingModule.sol:25"
           }
         ],
         "types": {
