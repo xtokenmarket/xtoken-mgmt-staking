@@ -73,7 +73,7 @@ contract RevenueController is Initializable, OwnableUpgradeable {
      * Withdraw fees from xAsset contract, and swap fee assets into xtk token and send to Mgmt
      *
      * @param _fundIndex    Index of xAsset
-     * @param _oneInchData  1inch low-level calldata(genented off-chain)
+     * @param _oneInchData  1inch low-level calldata(generated off-chain)
      */
     function claimAndSwap(uint256 _fundIndex, bytes[] memory _oneInchData) external onlyOwnerOrManager {
         require(_fundIndex > 0 && _fundIndex < nextFundIndex, "Invalid fund index");

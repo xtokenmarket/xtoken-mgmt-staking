@@ -36,7 +36,7 @@ contract RewardController is Initializable, OwnableUpgradeable {
 
     /* ============ Functions ============ */
 
-    function initialize(address _xtk, address _managementStakingModule) public initializer {
+    function initialize(address _xtk, address _managementStakingModule) external initializer {
         __Ownable_init();
 
         xtk = _xtk;
@@ -52,6 +52,7 @@ contract RewardController is Initializable, OwnableUpgradeable {
         require(block.timestamp >= periodFinish, "Cannot initiate period while reward ongoing");
         require(_rewardDuration > 0, "Invalid reward duration");
         require(_rewardPeriodAmount > 0, "Invalid reward amount");
+        require(_rewardPeriodAmount % _rewardDuration == 0, "Amount not multiple of duration");
 
         rewardRate = _rewardPeriodAmount / _rewardDuration;
         require(rewardRate > 0, "Invalid reward rate");
