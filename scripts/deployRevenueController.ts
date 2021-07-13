@@ -15,15 +15,9 @@ async function main(): Promise<void> {
   const xtk = "";
   const mgmt = "";
   const oneInchExchange = "";
-  const govOps = "";
 
   const RevenueController: ContractFactory = await ethers.getContractFactory("RevenueController");
-  const revenueController: Contract = await upgrades.deployProxy(RevenueController, [
-    xtk,
-    mgmt,
-    oneInchExchange,
-    govOps,
-  ]);
+  const revenueController: Contract = await upgrades.deployProxy(RevenueController, [xtk, mgmt, oneInchExchange]);
   await revenueController.deployed();
 
   console.log("RevenueController deployed to: ", revenueController.address);

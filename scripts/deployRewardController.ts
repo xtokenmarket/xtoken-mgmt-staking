@@ -14,10 +14,9 @@ async function main(): Promise<void> {
   // We get the contract to deploy
   const xtk = "";
   const mgmt = "";
-  const govOps = "";
 
   const RewardController: ContractFactory = await ethers.getContractFactory("RewardController");
-  const rewardController: Contract = await upgrades.deployProxy(RewardController, [xtk, mgmt, govOps]);
+  const rewardController: Contract = await upgrades.deployProxy(RewardController, [xtk, mgmt]);
   await rewardController.deployed();
 
   console.log("RewardController deployed to: ", rewardController.address);
