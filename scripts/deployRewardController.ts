@@ -12,11 +12,10 @@ async function main(): Promise<void> {
   // await run("compile");
 
   // We get the contract to deploy
-  const xtk = "";
   const mgmt = "";
 
   const RewardController: ContractFactory = await ethers.getContractFactory("RewardController");
-  const rewardController: Contract = await upgrades.deployProxy(RewardController, [xtk, mgmt]);
+  const rewardController: Contract = await upgrades.deployProxy(RewardController, [mgmt]);
   await rewardController.deployed();
 
   console.log("RewardController deployed to: ", rewardController.address);

@@ -17,7 +17,7 @@ contract XTKManagementStakingModule is Initializable, ERC20Upgradeable, OwnableU
     /* ============ State Variables ============ */
 
     // Address of xtk token
-    address public xtk;
+    address public constant xtk = 0x7F3EDcdD180Dbe4819Bd98FeE8929b5cEdB3AdEB;
 
     // Unstake penalty percentage between 0 and 10%
     uint256 public unstakePenalty;
@@ -35,12 +35,11 @@ contract XTKManagementStakingModule is Initializable, ERC20Upgradeable, OwnableU
 
     /* ============ Functions ============ */
 
-    function initialize(address _xtk) external initializer {
+    function initialize() external initializer {
         __Ownable_init();
         __ERC20_init_unchained("xXTK-Mgmt", "xXTKa");
 
         transferable = true;
-        xtk = _xtk;
     }
 
     /**

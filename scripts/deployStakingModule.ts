@@ -12,10 +12,9 @@ async function main(): Promise<void> {
   // await run("compile");
 
   // We get the contract to deploy
-  const xtk = "";
 
   const XTKManagementStakingModule: ContractFactory = await ethers.getContractFactory("XTKManagementStakingModule");
-  const xTKManagementStakingModule: Contract = await upgrades.deployProxy(XTKManagementStakingModule, [xtk]);
+  const xTKManagementStakingModule: Contract = await upgrades.deployProxy(XTKManagementStakingModule, []);
   await xTKManagementStakingModule.deployed();
 
   console.log("XTKManagementStakingModule deployed to: ", xTKManagementStakingModule.address);

@@ -12,18 +12,16 @@ async function main(): Promise<void> {
   // await run("compile");
 
   // We get the contract to deploy
-  const xtk = "0x7F3EDcdD180Dbe4819Bd98FeE8929b5cEdB3AdEB";
   const oneInchExchange = "0x11111112542D85B3EF69AE05771c2dCCff4fAa26";
 
   const XTKManagementStakingModule: ContractFactory = await ethers.getContractFactory("XTKManagementStakingModule");
-  const xTKManagementStakingModule: Contract = await upgrades.deployProxy(XTKManagementStakingModule, [xtk]);
+  const xTKManagementStakingModule: Contract = await upgrades.deployProxy(XTKManagementStakingModule, []);
   await xTKManagementStakingModule.deployed();
 
   console.log("XTKManagementStakingModule deployed to: ", xTKManagementStakingModule.address);
 
   const RevenueController: ContractFactory = await ethers.getContractFactory("RevenueController");
   const revenueController: Contract = await upgrades.deployProxy(RevenueController, [
-    xtk,
     xTKManagementStakingModule.address,
     oneInchExchange,
   ]);
@@ -32,10 +30,7 @@ async function main(): Promise<void> {
   console.log("RevenueController deployed to: ", revenueController.address);
 
   const RewardController: ContractFactory = await ethers.getContractFactory("RewardController");
-  const rewardController: Contract = await upgrades.deployProxy(RewardController, [
-    xtk,
-    xTKManagementStakingModule.address,
-  ]);
+  const rewardController: Contract = await upgrades.deployProxy(RewardController, [xTKManagementStakingModule.address]);
   await rewardController.deployed();
 
   console.log("RewardController deployed to: ", rewardController.address);

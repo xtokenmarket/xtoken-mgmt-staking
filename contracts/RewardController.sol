@@ -28,7 +28,7 @@ contract RewardController is Initializable, OwnableUpgradeable {
     uint256 public lastUpdateTime;
 
     // Address of xtk token
-    address public xtk;
+    address public constant xtk = 0x7F3EDcdD180Dbe4819Bd98FeE8929b5cEdB3AdEB;
     // Address of Mgmt module
     address public managementStakingModule;
 
@@ -39,10 +39,9 @@ contract RewardController is Initializable, OwnableUpgradeable {
 
     /* ============ Functions ============ */
 
-    function initialize(address _xtk, address _managementStakingModule) external initializer {
+    function initialize(address _managementStakingModule) external initializer {
         __Ownable_init();
 
-        xtk = _xtk;
         managementStakingModule = _managementStakingModule;
     }
 

@@ -24,7 +24,7 @@ contract RevenueController is Initializable, OwnableUpgradeable {
     uint256 public nextFundIndex;
 
     // Address of xtk token
-    address public xtk;
+    address public constant xtk = 0x7F3EDcdD180Dbe4819Bd98FeE8929b5cEdB3AdEB;
     // Address of Mgmt module
     address public managementStakingModule;
     // Address of OneInchExchange contract
@@ -58,16 +58,11 @@ contract RevenueController is Initializable, OwnableUpgradeable {
 
     /* ============ Functions ============ */
 
-    function initialize(
-        address _xtk,
-        address _managementStakingModule,
-        address _oneInchExchange
-    ) external initializer {
+    function initialize(address _managementStakingModule, address _oneInchExchange) external initializer {
         __Ownable_init();
 
         nextFundIndex = 1;
 
-        xtk = _xtk;
         managementStakingModule = _managementStakingModule;
         oneInchExchange = _oneInchExchange;
     }

@@ -44,9 +44,7 @@ describe("RevenueController Test", () => {
 
     // deploy and initialize
     const revenueControllerArtifact = await ethers.getContractFactory("RevenueController");
-    revenueController = <RevenueController>(
-      await upgrades.deployProxy(revenueControllerArtifact, [xtkAddress, mgmt, oneInchV3])
-    );
+    revenueController = <RevenueController>await upgrades.deployProxy(revenueControllerArtifact, [mgmt, oneInchV3]);
 
     // set managers by govOps
     await revenueController.connect(deployer).setManager(manager.address);

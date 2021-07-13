@@ -25,7 +25,7 @@ describe("RewardController Test", () => {
     mgmt = signers[1].address;
 
     const rewardControllerArtifact = await ethers.getContractFactory("RewardController");
-    rewardController = <RewardController>await upgrades.deployProxy(rewardControllerArtifact, [xtkAddress, mgmt]);
+    rewardController = <RewardController>await upgrades.deployProxy(rewardControllerArtifact, [mgmt]);
 
     await unlockAccount("0xA0b5Eb5464fE4C5F4334a80267E784A961fdD865");
     whale = await ethers.provider.getSigner("0xA0b5Eb5464fE4C5F4334a80267E784A961fdD865");

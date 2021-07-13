@@ -12,12 +12,11 @@ async function main(): Promise<void> {
   // await run("compile");
 
   // We get the contract to deploy
-  const xtk = "";
   const mgmt = "";
   const oneInchExchange = "";
 
   const RevenueController: ContractFactory = await ethers.getContractFactory("RevenueController");
-  const revenueController: Contract = await upgrades.deployProxy(RevenueController, [xtk, mgmt, oneInchExchange]);
+  const revenueController: Contract = await upgrades.deployProxy(RevenueController, [mgmt, oneInchExchange]);
   await revenueController.deployed();
 
   console.log("RevenueController deployed to: ", revenueController.address);

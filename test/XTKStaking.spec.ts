@@ -29,7 +29,7 @@ describe("XTKManagementStakingModule Test", () => {
     bob = signers[3];
 
     const rewardControllerArtifact = await ethers.getContractFactory("XTKManagementStakingModule");
-    stakingModule = <XTKManagementStakingModule>await upgrades.deployProxy(rewardControllerArtifact, [xtkAddress]);
+    stakingModule = <XTKManagementStakingModule>await upgrades.deployProxy(rewardControllerArtifact, []);
 
     await unlockAccount("0xA0b5Eb5464fE4C5F4334a80267E784A961fdD865");
     whale = await ethers.provider.getSigner("0xA0b5Eb5464fE4C5F4334a80267E784A961fdD865");
