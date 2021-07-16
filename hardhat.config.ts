@@ -41,6 +41,13 @@ if (!process.env.INFURA_API_KEY) {
   infuraApiKey = process.env.INFURA_API_KEY;
 }
 
+let deployAccountKey: string;
+if (!process.env.DEPLOY_ACCOUNT_KEY) {
+  throw new Error("Please set your DEPLOY_ACCOUNT_KEY in a .env file");
+} else {
+  deployAccountKey = process.env.DEPLOY_ACCOUNT_KEY;
+}
+
 function createTestnetConfig(network: keyof typeof chainIds): NetworkUserConfig {
   const url: string = "https://" + network + ".infura.io/v3/" + infuraApiKey;
   return {
@@ -74,6 +81,13 @@ const config: HardhatUserConfig = {
       },
       chainId: chainIds.mainnet,
     },
+    mainnet: {
+      accounts: [deployAccountKey],
+      gasPrice: 40 * 10 ** 9, // 40 Gwei
+      chainId: chainIds.mainnet,
+      url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`,
+      timeout: 200000,
+    },
     goerli: createTestnetConfig("goerli"),
     kovan: createTestnetConfig("kovan"),
     rinkeby: createTestnetConfig("rinkeby"),
@@ -100,6 +114,9 @@ const config: HardhatUserConfig = {
         runs: 800,
       },
     },
+  },
+  etherscan: {
+    apiKey: process.env.ETHERSCAN_API_KEY,
   },
   mocha: {
     timeout: 200000,
