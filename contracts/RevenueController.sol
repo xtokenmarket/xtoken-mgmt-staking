@@ -6,6 +6,7 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "./interface/IxAsset.sol";
+import "./interface/IxTokenManager.sol";
 
 /**
  * @title RevenueController
@@ -32,9 +33,8 @@ contract RevenueController is Initializable, OwnableUpgradeable {
     // Address to indicate ETH
     address private constant ETH_ADDRESS = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
 
-    // Manager
-    address private manager;
-    address private manager2;
+    //
+    address public xtokenManager;
 
     // xAsset to index
     mapping(address => uint256) private _fundToIndex;
@@ -52,19 +52,27 @@ contract RevenueController is Initializable, OwnableUpgradeable {
     /* ============ Modifiers ============ */
 
     modifier onlyOwnerOrManager {
-        require(msg.sender == owner() || msg.sender == manager || msg.sender == manager2, "Non-admin caller");
+        require(
+            msg.sender == owner() || IxTokenManager(xtokenManager).isManager(address(this), msg.sender),
+            "Non-admin caller"
+        );
         _;
     }
 
     /* ============ Functions ============ */
 
-    function initialize(address _managementStakingModule, address _oneInchExchange) external initializer {
+    function initialize(
+        address _managementStakingModule,
+        address _oneInchExchange,
+        address _xtokenManager
+    ) external initializer {
         __Ownable_init();
 
         nextFundIndex = 1;
 
         managementStakingModule = _managementStakingModule;
         oneInchExchange = _oneInchExchange;
+        xtokenManager = _xtokenManager;
     }
 
     /**
@@ -156,20 +164,6 @@ contract RevenueController is Initializable, OwnableUpgradeable {
         }
 
         emit FundAdded(_fund, nextFundIndex - 1);
-    }
-
-    /*
-     * @notice manager == alternative admin caller to owner
-     */
-    function setManager(address _manager) public onlyOwner {
-        manager = _manager;
-    }
-
-    /*
-     * @notice manager2 == alternative admin caller to owner
-     */
-    function setManager2(address _manager2) public onlyOwner {
-        manager2 = _manager2;
     }
 
     /**
