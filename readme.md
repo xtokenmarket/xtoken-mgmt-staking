@@ -13,5 +13,5 @@ One foreseaable potential complication is that, due to the proxy framework we’
 
 - ProxyAdmin: 0x54FF0Bf514134A24D2795c554952E0ce1F47aC79
 - XTKManagementStakingModule: 0x314022E24ceD941781DC295682634B37Bd0d9cFc
-- RevenueController: 0xbc36d8121B82C0B8E7EF0374ea19fC073335CC3C
+- RevenueController: 0x37310ee55D433E51530b3efE41990360D6dBCFC3
 - RewardController: 0x95B6d1848A9940a42F22054084c0590A9997C653
