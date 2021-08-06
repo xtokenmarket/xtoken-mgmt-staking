@@ -1,5 +1,5 @@
 pragma solidity ^0.8.0;
 
 interface IxTokenManager {
-    function isManager(address fund, address caller) external view returns (bool);
+    function isManager(address manager, address fund) external view returns (bool);
 }

@@ -77,9 +77,11 @@ const config: HardhatUserConfig = {
       },
       forking: {
         url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`,
-        blockNumber: 12787568,
+        blockNumber: 12968176,
       },
       chainId: chainIds.mainnet,
+      hardfork: "london",
+      gasPrice: "auto",
     },
     mainnet: {
       accounts: [deployAccountKey],
