@@ -53,7 +53,7 @@ contract RevenueController is Initializable, OwnableUpgradeable {
 
     modifier onlyOwnerOrManager {
         require(
-            msg.sender == owner() || IxTokenManager(xtokenManager).isManager(address(this), msg.sender),
+            msg.sender == owner() || IxTokenManager(xtokenManager).isManager(msg.sender, address(this)),
             "Non-admin caller"
         );
         _;

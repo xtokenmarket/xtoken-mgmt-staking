@@ -4,6 +4,8 @@ interface IxAsset {
     function withdrawFees() external;
 
     function transferOwnership(address newOwner) external;
+
+    function getWithdrawableFees() external view returns (address[2] memory, uint256[2] memory);
 }
 
 interface IxINCH is IxAsset {

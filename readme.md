@@ -6,7 +6,6 @@ One foreseaable potential complication is that, due to the proxy framework we’
 
 ## TODO
 
-- we'll need to upgrade xAsset funds to change `withdrawFees` permissions from `onlyOwner` to `onlyRevenueController` or something similar
 - create a new "Governance" contract that controls operations on the staking module. This should be controlled by team multisig (need to figure out these details)
 
 ## Deployed Contracts Addresses

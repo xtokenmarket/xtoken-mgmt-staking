@@ -12,7 +12,6 @@ import { resolve } from "path";
 
 import { config as dotenvConfig } from "dotenv";
 import { HardhatUserConfig } from "hardhat/config";
-import { NetworkUserConfig } from "hardhat/types";
 
 dotenvConfig({ path: resolve(__dirname, "./.env") });
 
@@ -26,21 +25,6 @@ const chainIds = {
   ropsten: 3,
 };
 
-// Ensure that we have all the environment variables we need.
-let mnemonic: string;
-if (!process.env.MNEMONIC) {
-  throw new Error("Please set your MNEMONIC in a .env file");
-} else {
-  mnemonic = process.env.MNEMONIC;
-}
-
-let infuraApiKey: string;
-if (!process.env.INFURA_API_KEY) {
-  throw new Error("Please set your INFURA_API_KEY in a .env file");
-} else {
-  infuraApiKey = process.env.INFURA_API_KEY;
-}
-
 let deployAccountKey: string;
 if (!process.env.DEPLOY_ACCOUNT_KEY) {
   throw new Error("Please set your DEPLOY_ACCOUNT_KEY in a .env file");
@@ -48,50 +32,43 @@ if (!process.env.DEPLOY_ACCOUNT_KEY) {
   deployAccountKey = process.env.DEPLOY_ACCOUNT_KEY;
 }
 
-function createTestnetConfig(network: keyof typeof chainIds): NetworkUserConfig {
-  const url: string = "https://" + network + ".infura.io/v3/" + infuraApiKey;
-  return {
-    accounts: {
-      count: 10,
-      initialIndex: 0,
-      mnemonic,
-      path: "m/44'/60'/0'/0",
-    },
-    chainId: chainIds[network],
-    url,
-  };
+let alchemyapi: string;
+if (!process.env.ALCHEMY_API_KEY) {
+  throw new Error("Please set your ALCHEMY_API_KEY in a .env file");
+} else {
+  alchemyapi = process.env.ALCHEMY_API_KEY;
 }
 
 const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
   gasReporter: {
     currency: "USD",
-    enabled: process.env.REPORT_GAS ? true : false,
+    enabled: false,
     excludeContracts: [],
     src: "./contracts",
   },
   networks: {
     hardhat: {
-      accounts: {
-        mnemonic,
-      },
+      accounts: [
+        {
+          privateKey: deployAccountKey,
+          balance: "1000000000000000000000",
+        },
+      ],
       forking: {
-        url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`,
-        blockNumber: 12787568,
+        url: `https://eth-mainnet.alchemyapi.io/v2/${alchemyapi}`,
+        blockNumber: 12991637,
       },
-      chainId: chainIds.mainnet,
+      hardfork: "london",
+      gasPrice: "auto",
     },
     mainnet: {
       accounts: [deployAccountKey],
-      gasPrice: 40 * 10 ** 9, // 40 Gwei
+      gasPrice: 50 * 10 ** 9, // 40 Gwei
       chainId: chainIds.mainnet,
-      url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`,
+      url: `https://eth-mainnet.alchemyapi.io/v2/${alchemyapi}`,
       timeout: 200000,
     },
-    goerli: createTestnetConfig("goerli"),
-    kovan: createTestnetConfig("kovan"),
-    rinkeby: createTestnetConfig("rinkeby"),
-    ropsten: createTestnetConfig("ropsten"),
   },
   paths: {
     artifacts: "./artifacts",
