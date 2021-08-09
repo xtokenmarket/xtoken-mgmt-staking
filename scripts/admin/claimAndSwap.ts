@@ -1,27 +1,27 @@
-import hre, { ethers } from "hardhat";
-import { Artifact } from "hardhat/types";
+import { ethers } from "hardhat";
 import { BigNumber } from "@ethersproject/bignumber";
 import axios from "axios";
 
 import { ETH_ADDRESS } from "../../test/utils";
 import { RevenueController, IxAsset } from "../../typechain";
 import { unlockAccount } from "../../test/utils";
+import addresses from "./address.json";
 
-const revenueControllerAddress = "0x37310ee55D433E51530b3efE41990360D6dBCFC3";
-const xtkAddress = "0x7F3EDcdD180Dbe4819Bd98FeE8929b5cEdB3AdEB";
+const revenueControllerAddress = addresses.revenueController;
+const xtkAddress = addresses.xtk;
 
-const managerAddress = "0x4c0c29539c463af348f8cba8c02d644a8d68c320";
-const fundAddress = "0x704De5696dF237c5B9ba0De9ba7e0C63dA8eA0Df"; // xAAVEb
-const feeAssets = [ETH_ADDRESS, "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9"];
+const managerAddress = addresses.manager;
+const fundAddress = addresses.xAAVEb;
+const feeAssets = [ETH_ADDRESS, addresses.aave];
 
 async function main(): Promise<void> {
   await unlockAccount(managerAddress);
   const manager = await ethers.provider.getSigner(managerAddress);
 
-  const rcArtifacts: Artifact = await hre.artifacts.readArtifact("RevenueController");
-  const revenueController = <RevenueController>await ethers.getContractAt(rcArtifacts.abi, revenueControllerAddress);
-  const xAssetArtifacts: Artifact = await hre.artifacts.readArtifact("IxAsset");
-  const xAsset = <IxAsset>await ethers.getContractAt(xAssetArtifacts.abi, fundAddress);
+  const revenueController = <RevenueController>(
+    await ethers.getContractAt("RevenueController", revenueControllerAddress)
+  );
+  const xAsset = <IxAsset>await ethers.getContractAt("IxAsset", fundAddress);
 
   await revenueController.connect(manager).addFund(fundAddress, feeAssets);
 

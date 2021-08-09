@@ -1,20 +1,21 @@
-import hre, { ethers } from "hardhat";
-import { Artifact } from "hardhat/types";
+import { ethers } from "hardhat";
 import { BigNumber } from "@ethersproject/bignumber";
 import axios from "axios";
 
 import { ETH_ADDRESS } from "../../test/utils";
 import { RevenueController, IERC20 } from "../../typechain";
+import addresses from "./address.json";
 
-const revenueControllerAddress = "0x37310ee55D433E51530b3efE41990360D6dBCFC3";
-const xtkAddress = "0x7F3EDcdD180Dbe4819Bd98FeE8929b5cEdB3AdEB";
+const revenueControllerAddress = addresses.revenueController;
+const xtkAddress = addresses.xtk;
 
-const fundAddress = "0x704De5696dF237c5B9ba0De9ba7e0C63dA8eA0Df"; // xAAVEb
-const fundAsset: any = "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9";
+const fundAddress = addresses.xAAVEb;
+const fundAsset: any = addresses.aave;
 
 async function main(): Promise<void> {
-  const rcArtifacts: Artifact = await hre.artifacts.readArtifact("RevenueController");
-  const revenueController = <RevenueController>await ethers.getContractAt(rcArtifacts.abi, revenueControllerAddress);
+  const revenueController = <RevenueController>(
+    await ethers.getContractAt("RevenueController", revenueControllerAddress)
+  );
 
   const fundIndex: BigNumber = await revenueController.getFundIndex(fundAddress);
   const fundAssets: string[] = await revenueController.getFundAssets(fundAddress);
@@ -35,8 +36,7 @@ async function main(): Promise<void> {
   if (fundAsset === ETH_ADDRESS) {
     fundAssetFeeBalance = await ethers.provider.getBalance(revenueControllerAddress);
   } else {
-    const erc20Artifacts: Artifact = await hre.artifacts.readArtifact("IERC20");
-    const erc20 = <IERC20>await ethers.getContractAt(erc20Artifacts.abi, fundAsset);
+    const erc20 = <IERC20>await ethers.getContractAt("IERC20", fundAsset);
     fundAssetFeeBalance = await erc20.balanceOf(revenueControllerAddress);
   }
 
