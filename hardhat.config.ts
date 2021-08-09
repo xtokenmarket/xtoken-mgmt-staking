@@ -49,15 +49,15 @@ const config: HardhatUserConfig = {
   },
   networks: {
     hardhat: {
-      // accounts: [
-      //   {
-      //     privateKey: deployAccountKey,
-      //     balance: "1000000000000000000000",
-      //   },
-      // ],
+      accounts: [
+        {
+          privateKey: deployAccountKey,
+          balance: "1000000000000000000000",
+        },
+      ],
       forking: {
         url: `https://eth-mainnet.alchemyapi.io/v2/${alchemyapi}`,
-        blockNumber: 12968176,
+        blockNumber: 12991637,
       },
       hardfork: "london",
       gasPrice: "auto",
