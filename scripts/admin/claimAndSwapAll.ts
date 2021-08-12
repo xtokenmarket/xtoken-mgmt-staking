@@ -2,6 +2,7 @@ import { ethers } from "hardhat";
 import { BigNumber } from "@ethersproject/bignumber";
 import axios from "axios";
 
+import { ETH_ADDRESS } from "./../../test/utils/constants";
 import { RevenueController, IxAsset, IERC20 } from "../../typechain";
 import addresses from "./address.json";
 
@@ -47,13 +48,15 @@ async function main(): Promise<void> {
     calldata = response.data.tx.data;
 
     const claimAndSwapData: any[] = [];
+    const callValue: any[] = [];
     for (let i = 0; i < fundAssets.length; i++) {
       claimAndSwapData[i] = [];
     }
     claimAndSwapData[0] = calldata;
+    callValue[0] = fundAssets[0] === ETH_ADDRESS ? feeBalances[0] : 0;
 
     console.log("Calling claimAndSwap...");
-    await revenueController.claimAndSwap(fundIndex, claimAndSwapData);
+    await revenueController.claimAndSwap(fundIndex, claimAndSwapData, callValue);
 
     if (fundAssets.length > 1) {
       for (let i = 1; i < fundAssets.length; i++) {
@@ -62,7 +65,12 @@ async function main(): Promise<void> {
         calldata = response.data.tx.data;
 
         console.log("swapOnceClaimed...", fundAssets[i]);
-        await revenueController.swapOnceClaimed(fundIndex, i, calldata);
+        await revenueController.swapOnceClaimed(
+          fundIndex,
+          i,
+          calldata,
+          fundAssets[i] === ETH_ADDRESS ? feeBalances[i] : 0,
+        );
       }
     }
   }

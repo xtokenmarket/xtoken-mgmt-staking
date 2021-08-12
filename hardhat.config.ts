@@ -57,7 +57,7 @@ const config: HardhatUserConfig = {
       ],
       forking: {
         url: `https://eth-mainnet.alchemyapi.io/v2/${alchemyapi}`,
-        blockNumber: 13004808,
+        blockNumber: 13010656,
       },
       hardfork: "london",
       gasPrice: "auto",

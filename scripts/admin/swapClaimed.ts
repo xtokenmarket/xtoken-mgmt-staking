@@ -47,7 +47,9 @@ async function main(): Promise<void> {
     console.error("Fee balance is zero");
     return;
   }
-  console.log("FundAssetFeeBalance:", fundAssetFeeBalance.toString());
+  console.log("FundAssetFeeBalance before swap:", fundAssetFeeBalance.toString());
+
+  fundAssetFeeBalance = fundAssetFeeBalance.div(2); // swap half
 
   let apiUrl;
   let response;
@@ -62,10 +64,24 @@ async function main(): Promise<void> {
   response = await axios.get(apiUrl);
   calldata = response.data.tx.data;
 
-  await revenueController.swapOnceClaimed(fundIndex, fundAssetIndex, calldata);
+  await revenueController.swapOnceClaimed(
+    fundIndex,
+    fundAssetIndex,
+    calldata,
+    fundAsset === ETH_ADDRESS ? fundAssetFeeBalance : 0,
+  );
 
   xtkBalanceAfter = await xtk.balanceOf(stakingModuleAddress);
   console.log("StakingModule XTK balance after swap: ", xtkBalanceAfter.toString());
+
+  if (fundAsset === ETH_ADDRESS) {
+    fundAssetFeeBalance = await ethers.provider.getBalance(revenueControllerAddress);
+  } else {
+    const erc20 = <IERC20>await ethers.getContractAt("IERC20", fundAsset);
+    fundAssetFeeBalance = await erc20.balanceOf(revenueControllerAddress);
+  }
+  console.log("FundAssetFeeBalance after swap:", fundAssetFeeBalance.toString());
+
   console.log("Total XTK swapped: ", xtkBalanceAfter.sub(xtkBalanceBefore).toString());
 }
 
