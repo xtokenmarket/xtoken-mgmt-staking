@@ -6,7 +6,7 @@ import { Signer } from "ethers";
 import { expect } from "chai";
 import axios from "axios";
 
-import { unlockAccount, getSnapShot, revertEvm, ZERO, ether, ETH_ADDRESS } from "./utils";
+import { unlockAccount, getSnapShot, revertEvm, ZERO, MAX_UINT_256, ether, ETH_ADDRESS } from "./utils";
 import { RevenueController, IxAsset, IERC20, IxINCH, ProxyAdmin } from "../typechain";
 
 describe("RevenueController Test", () => {
@@ -18,10 +18,10 @@ describe("RevenueController Test", () => {
   let revenueController: RevenueController;
   let xINCHa: IxINCH;
   let inch: IERC20;
+  let aave: IERC20;
   let xtk: IERC20;
   let proxyAdmin: ProxyAdmin;
 
-  // oneInchExchange = "0x11111254369792b2Ca5d084aB5eEA397cA8fa48B";
   const oneInchV3 = "0x11111112542D85B3EF69AE05771c2dCCff4fAa26";
   const xTokenDeployerAddress = "0x38138586AedB29B436eAB16105b09c317F5a79dd";
   const multiSigAddress = "0x105Ed4E2980CC60A13DdF854c75133434D6b4074";
@@ -33,6 +33,8 @@ describe("RevenueController Test", () => {
   const xINCHaAddress = "0x8F6A193C8B3c949E1046f1547C3A3f0836944E4b";
   const xINCHbAddress = "0x6B33f15360cedBFB8F60539ec828ef52910acA9b";
   const inchAddress = "0x111111111117dC0aa78b770fA6A738034120C302";
+  const xAAVEbAddress = "0x704De5696dF237c5B9ba0De9ba7e0C63dA8eA0Df";
+  const aaveAddress = "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9";
 
   before(async () => {
     const signers: SignerWithAddress[] = await hre.ethers.getSigners();
@@ -67,6 +69,7 @@ describe("RevenueController Test", () => {
 
     const erc20Artifacts: Artifact = await hre.artifacts.readArtifact("IERC20");
     inch = <IERC20>await ethers.getContractAt(erc20Artifacts.abi, inchAddress);
+    aave = <IERC20>await ethers.getContractAt(erc20Artifacts.abi, aaveAddress);
     xtk = <IERC20>await ethers.getContractAt(erc20Artifacts.abi, xtkAddress);
   });
 
@@ -82,7 +85,7 @@ describe("RevenueController Test", () => {
       expect(await revenueController.oneInchExchange()).to.equal(oneInchV3);
     });
 
-    it("should add fund", async () => {
+    it("should add fund: xINCHa", async () => {
       await revenueController.connect(owner).addFund(xINCHaAddress, [ETH_ADDRESS, inchAddress]);
       expect(await revenueController.getFundIndex(xINCHaAddress)).to.equal(BigNumber.from(2));
       const inchFundAssets = await revenueController.getFundAssets(xINCHaAddress);
@@ -90,12 +93,22 @@ describe("RevenueController Test", () => {
       expect(inchFundAssets[1]).to.equal(inchAddress);
     });
 
-    it("should add fund", async () => {
+    it("should add fund: xINCHb", async () => {
       await revenueController.connect(owner).addFund(xINCHbAddress, [ETH_ADDRESS, inchAddress]);
       expect(await revenueController.getFundIndex(xINCHbAddress)).to.equal(BigNumber.from(3));
       const inchFundAssets = await revenueController.getFundAssets(xINCHbAddress);
       expect(inchFundAssets[0]).to.equal(ETH_ADDRESS);
       expect(inchFundAssets[1]).to.equal(inchAddress);
+    });
+
+    it("should add fund: xAAVEb", async () => {
+      expect(await aave.allowance(revenueController.address, oneInchV3)).to.gt(ZERO);
+      await revenueController.connect(owner).addFund(xAAVEbAddress, [ETH_ADDRESS, aaveAddress]);
+      expect(await aave.allowance(revenueController.address, oneInchV3)).to.eq(MAX_UINT_256);
+      expect(await revenueController.getFundIndex(xAAVEbAddress)).to.equal(BigNumber.from(4));
+      const inchFundAssets = await revenueController.getFundAssets(xAAVEbAddress);
+      expect(inchFundAssets[0]).to.equal(ETH_ADDRESS);
+      expect(inchFundAssets[1]).to.equal(aaveAddress);
     });
   });
 
