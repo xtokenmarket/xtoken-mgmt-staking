@@ -31,6 +31,7 @@ describe("RevenueController Test", () => {
 
   const xtkAddress = "0x7F3EDcdD180Dbe4819Bd98FeE8929b5cEdB3AdEB";
   const xINCHaAddress = "0x8F6A193C8B3c949E1046f1547C3A3f0836944E4b";
+  const xINCHbAddress = "0x6B33f15360cedBFB8F60539ec828ef52910acA9b";
   const inchAddress = "0x111111111117dC0aa78b770fA6A738034120C302";
 
   before(async () => {
@@ -85,6 +86,14 @@ describe("RevenueController Test", () => {
       await revenueController.connect(owner).addFund(xINCHaAddress, [ETH_ADDRESS, inchAddress]);
       expect(await revenueController.getFundIndex(xINCHaAddress)).to.equal(BigNumber.from(2));
       const inchFundAssets = await revenueController.getFundAssets(xINCHaAddress);
+      expect(inchFundAssets[0]).to.equal(ETH_ADDRESS);
+      expect(inchFundAssets[1]).to.equal(inchAddress);
+    });
+
+    it("should add fund", async () => {
+      await revenueController.connect(owner).addFund(xINCHbAddress, [ETH_ADDRESS, inchAddress]);
+      expect(await revenueController.getFundIndex(xINCHbAddress)).to.equal(BigNumber.from(3));
+      const inchFundAssets = await revenueController.getFundAssets(xINCHbAddress);
       expect(inchFundAssets[0]).to.equal(ETH_ADDRESS);
       expect(inchFundAssets[1]).to.equal(inchAddress);
     });

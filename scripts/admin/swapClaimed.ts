@@ -49,7 +49,7 @@ async function main(): Promise<void> {
   }
   console.log("FundAssetFeeBalance before swap:", fundAssetFeeBalance.toString());
 
-  fundAssetFeeBalance = fundAssetFeeBalance.div(2); // swap half
+  // fundAssetFeeBalance = fundAssetFeeBalance.div(2); // swap half
 
   let apiUrl;
   let response;

@@ -181,7 +181,7 @@ contract RevenueController is Initializable, OwnableUpgradeable {
         _fundAssets[_fund] = _assets;
 
         for (uint256 i = 0; i < _assets.length; ++i) {
-            if (_assets[i] != ETH_ADDRESS) {
+            if (_assets[i] != ETH_ADDRESS && IERC20(_assets[i]).allowance(address(this), oneInchExchange) != 0) {
                 IERC20(_assets[i]).safeApprove(oneInchExchange, type(uint256).max);
             }
         }
