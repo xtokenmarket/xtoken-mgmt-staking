@@ -101,7 +101,7 @@ contract RewardController is Initializable, OwnableUpgradeable, KeeperCompatible
     }
 
     /**
-     * Used by the keep network to perform the work that needs to be done
+     * Used by the keeper network to perform the work that needs to be done
      */
     function performUpkeep(bytes calldata) external override {
         releaseReward();
