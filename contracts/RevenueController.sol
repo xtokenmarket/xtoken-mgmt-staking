@@ -25,7 +25,7 @@ contract RevenueController is Initializable, OwnableUpgradeable {
     uint256 public nextFundIndex;
 
     // Address of xtk token
-    address public constant xtk = 0x7F3EDcdD180Dbe4819Bd98FeE8929b5cEdB3AdEB;
+    address public constant xtk = 0x3e5E39e1512C720273E3E3b6d40b919bD6bbb996;
     // Address of Mgmt module
     address public managementStakingModule;
     // Address of OneInchExchange contract
@@ -182,8 +182,8 @@ contract RevenueController is Initializable, OwnableUpgradeable {
 
         for (uint256 i = 0; i < _assets.length; ++i) {
             if (_assets[i] != ETH_ADDRESS) {
-                if(IERC20(_assets[i]).allowance(address(this), oneInchExchange) > 0) {
-                    IERC20(_assets[i]).safeApprove(oneInchExchange, 0);    
+                if (IERC20(_assets[i]).allowance(address(this), oneInchExchange) > 0) {
+                    IERC20(_assets[i]).safeApprove(oneInchExchange, 0);
                 }
                 IERC20(_assets[i]).safeApprove(oneInchExchange, type(uint256).max);
             }

@@ -17,7 +17,7 @@ contract XTKManagementStakingModule is Initializable, ERC20Upgradeable, OwnableU
     /* ============ State Variables ============ */
 
     // Address of xtk token
-    address public constant xtk = 0x7F3EDcdD180Dbe4819Bd98FeE8929b5cEdB3AdEB;
+    address public constant xtk = 0x3e5E39e1512C720273E3E3b6d40b919bD6bbb996;
 
     // Unstake penalty percentage between 0 and 10%
     uint256 public unstakePenalty;
