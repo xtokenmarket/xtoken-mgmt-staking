@@ -5,6 +5,8 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
+import "@chainlink/contracts/src/v0.8/interfaces/KeeperCompatibleInterface.sol";
+
 /**
  * @title RewardController
  * @author xToken
@@ -15,7 +17,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
  * publicly callable function can release the proportional amount of XTK available since the
  * last call. This function transfers the XTK from the RewardController to the staking module.
  */
-contract RewardController is Initializable, OwnableUpgradeable {
+contract RewardController is Initializable, OwnableUpgradeable, KeeperCompatibleInterface {
     using SafeERC20 for IERC20;
 
     /* ============ State Variables ============ */
@@ -31,6 +33,9 @@ contract RewardController is Initializable, OwnableUpgradeable {
     address public constant xtk = 0x7F3EDcdD180Dbe4819Bd98FeE8929b5cEdB3AdEB;
     // Address of Mgmt module
     address public managementStakingModule;
+
+    // The target rewards release interval
+    uint256 public constant REWARDS_RELEASE_INTERVAL = 36 hours;
 
     /* ============ Events ============ */
 
@@ -71,7 +76,7 @@ contract RewardController is Initializable, OwnableUpgradeable {
     /**
      * Transfer proportional xtk to Mgmt module
      */
-    function releaseReward() external {
+    function releaseReward() public {
         uint256 releasableReward = (lastTimeRewardApplicable() - lastUpdateTime) * rewardRate;
         require(releasableReward > 0, "Releasable reward is zero");
 
@@ -86,5 +91,19 @@ contract RewardController is Initializable, OwnableUpgradeable {
      */
     function lastTimeRewardApplicable() public view returns (uint256) {
         return block.timestamp > periodFinish ? periodFinish : block.timestamp;
+    }
+
+    /**
+     * Used by the keeper network to check if work needs to be done
+     */
+    function checkUpkeep(bytes calldata) external override returns (bool upkeepNeeded, bytes memory) {
+        upkeepNeeded = (block.timestamp - lastUpdateTime) > REWARDS_RELEASE_INTERVAL;
+    }
+
+    /**
+     * Used by the keeper network to perform the work that needs to be done
+     */
+    function performUpkeep(bytes calldata) external override {
+        releaseReward();
     }
 }
