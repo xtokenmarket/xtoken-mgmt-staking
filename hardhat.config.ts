@@ -57,14 +57,14 @@ const config: HardhatUserConfig = {
       ],
       forking: {
         url: `https://eth-mainnet.alchemyapi.io/v2/${alchemyapi}`,
-        blockNumber: 13010656,
+        blockNumber: 13123953,
       },
       hardfork: "london",
       gasPrice: "auto",
     },
     mainnet: {
       accounts: [deployAccountKey],
-      gasPrice: 50 * 10 ** 9, // 40 Gwei
+      // gasPrice: 150 * 10 ** 9, // 40 Gwei
       chainId: chainIds.mainnet,
       url: `https://eth-mainnet.alchemyapi.io/v2/${alchemyapi}`,
       timeout: 200000,

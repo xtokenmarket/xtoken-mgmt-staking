@@ -10,8 +10,8 @@ const revenueControllerAddress = addresses.revenueController;
 const xtkAddress = addresses.xtk;
 const stakingModuleAddress = addresses.stakingModule;
 
-const fundAddress = addresses.xAAVEa;
-const fundAsset: any = addresses.aave;
+const fundAddress = addresses.xINCHa;
+const fundAsset: any = addresses.inch;
 
 async function main(): Promise<void> {
   console.log("Initiating contract instances...");
@@ -69,6 +69,10 @@ async function main(): Promise<void> {
     fundAssetIndex,
     calldata,
     fundAsset === ETH_ADDRESS ? fundAssetFeeBalance : 0,
+    {
+      // maxFeePerGas: BigNumberish | Promise<BigNumberish>,
+      maxPriorityFeePerGas: 2 * 10 ** 9,
+    },
   );
 
   xtkBalanceAfter = await xtk.balanceOf(stakingModuleAddress);

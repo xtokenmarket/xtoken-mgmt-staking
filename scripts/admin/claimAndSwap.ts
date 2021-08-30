@@ -10,7 +10,7 @@ const revenueControllerAddress = addresses.revenueController;
 const xtkAddress = addresses.xtk;
 const stakingModuleAddress = addresses.stakingModule;
 
-const fundAddress = addresses.xAAVEa;
+const fundAddress = addresses.xINCHa;
 
 async function main(): Promise<void> {
   console.log("Initiating contract instances...");
@@ -43,7 +43,7 @@ async function main(): Promise<void> {
   console.log("StakingModule XTK balance before swap: ", xtkBalanceBefore.toString());
 
   if (fundAssets.length > 0) {
-    apiUrl = `https://api.1inch.exchange/v3.0/1/swap?fromTokenAddress=${fundAssets[0]}&toTokenAddress=${xtkAddress}&amount=${feeBalances[0]}&fromAddress=${revenueControllerAddress}&slippage=1&disableEstimate=true`;
+    apiUrl = `https://api.1inch.exchange/v3.0/1/swap?fromTokenAddress=${fundAssets[0]}&toTokenAddress=${xtkAddress}&amount=${feeBalances[0]}&fromAddress=${revenueControllerAddress}&slippage=0.5&disableEstimate=true`;
     response = await axios.get(apiUrl);
     calldata = response.data.tx.data;
 
