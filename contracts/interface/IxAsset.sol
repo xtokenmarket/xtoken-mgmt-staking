@@ -15,3 +15,13 @@ interface IxINCH is IxAsset {
 interface IxAAVE is IxAsset {
     function withdrawableAaveFees() external view returns (uint256);
 }
+
+interface IxSNX is IxAsset {
+    function withdrawableEthFees() external view returns (uint256);
+    function withdrawableSusdFees() external view returns (uint256);
+}
+
+interface IxU3LP is IxAsset {
+    function withdrawableToken0Fees() external view returns (uint256);
+    function withdrawableToken1Fees() external view returns (uint256);
+}
