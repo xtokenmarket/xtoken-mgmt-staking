@@ -7,6 +7,11 @@ import { ETH_ADDRESS } from "./../../test/utils/constants";
 import { RevenueController, IxU3LP, IERC20 } from "../../typechain";
 import addresses from "./address.json";
 
+import { resolve } from "path";
+
+import { config as dotenvConfig } from "dotenv";
+dotenvConfig({ path: resolve(__dirname, "../../.env") });
+
 // xtoken address
 const revenueControllerAddress = addresses.revenueController;
 const xtkAddress = addresses.xtk;
@@ -26,7 +31,11 @@ async function main(): Promise<void> {
   // initialize the flashbots provider
   const authSigner = ethers.Wallet.createRandom();
   const [wallet] = await ethers.getSigners();
-  const walletSigner = new ethers.Wallet("process.env.PRIVATE_KEY");
+  const privateKey = process.env.DEPLOY_ACCOUNT_KEY;
+  if (!privateKey) {
+    throw new Error("Please set your privateKey in a .env file");
+  }
+  const walletSigner = new ethers.Wallet(privateKey);
   const flashbotsProvider = await FlashbotsBundleProvider.create(ethers.provider, authSigner);
 
   // get the xtoken contracts
