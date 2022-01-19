@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "dependencies": {
     "@chainlink/contracts": "^0.2.1",
+    "@flashbots/ethers-provider-bundle": "^0.4.3",
     "@openzeppelin/contracts": "^4.1.0",
     "@openzeppelin/contracts-upgradeable": "^4.1.0",
     "axios": "^0.21.1"
