@@ -8,6 +8,10 @@ interface IxAsset {
     function getWithdrawableFees() external view returns (address[2] memory, uint256[2] memory);
 }
 
+interface ILMTerminal {
+    function withdrawFees(address token) external;
+}
+
 interface IxINCH is IxAsset {
     function withdrawableOneInchFees() external view returns (uint256);
 }

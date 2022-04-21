@@ -43,6 +43,8 @@ contract RevenueController is Initializable, OwnableUpgradeable {
     // Index to xAsset
     mapping(uint256 => address) private _indexToFund;
 
+    address public constant terminal = 0x090559D58aAB8828C27eE7a7EAb18efD5bB90374;
+
     /* ============ Events ============ */
 
     event FeesClaimed(address indexed fund, address indexed revenueToken, uint256 revenueTokenAmount);
@@ -97,13 +99,22 @@ contract RevenueController is Initializable, OwnableUpgradeable {
 
         IxAsset(fund).withdrawFees();
 
-        for (uint256 i = 0; i < fundAssets.length; i++) {
-            uint256 revenueTokenBalance = getRevenueTokenBalance(fundAssets[i]);
+        swapAssets(fund, fundAssets, _oneInchData, _callValue);
+    }
+
+    function swapAssets (
+        address _fund,
+        address[] memory _assets,
+        bytes[] calldata _oneInchData,
+        uint256[] calldata _callValue
+    ) private {
+        for (uint256 i = 0; i < _assets.length; i++) {
+            uint256 revenueTokenBalance = getRevenueTokenBalance(_assets[i]);
 
             if (revenueTokenBalance > 0) {
-                emit FeesClaimed(fund, fundAssets[i], revenueTokenBalance);
+                emit FeesClaimed(_fund, _assets[i], revenueTokenBalance);
                 if (_oneInchData[i].length > 0) {
-                    swapAssetToXtk(fundAssets[i], _oneInchData[i], _callValue[i]);
+                    swapAssetToXtk(_assets[i], _oneInchData[i], _callValue[i]);
                 }
             }
         }
@@ -111,7 +122,26 @@ contract RevenueController is Initializable, OwnableUpgradeable {
         uint256 xtkBalance = IERC20(xtk).balanceOf(address(this));
         IERC20(xtk).safeTransfer(managementStakingModule, xtkBalance);
 
-        emit RevenueAccrued(fund, xtkBalance, block.timestamp);
+        emit RevenueAccrued(_fund, xtkBalance, block.timestamp);
+    }
+
+    function claimTerminalFeesAndSwap(
+        address _token,
+        bytes[] calldata _oneInchData,
+        uint256[] calldata _callValue
+    ) external onlyOwnerOrManager {
+        require(_token != address(0), "Invalid token address");
+        require(_oneInchData.length == 2, "Params mismatch");
+        require(_callValue.length == 2, "Params mismatch");
+
+        ILMTerminal(terminal).withdrawFees(_token);
+
+        address[] memory assets = new address[](2);
+
+        assets[0] = ETH_ADDRESS;
+        assets[1] = _token;
+
+        swapAssets(terminal, assets, _oneInchData, _callValue);
     }
 
     function swapOnceClaimed(
