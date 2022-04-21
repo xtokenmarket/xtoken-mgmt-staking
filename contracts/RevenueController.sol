@@ -102,29 +102,6 @@ contract RevenueController is Initializable, OwnableUpgradeable {
         swapAssets(fund, fundAssets, _oneInchData, _callValue);
     }
 
-    function swapAssets (
-        address _fund,
-        address[] memory _assets,
-        bytes[] calldata _oneInchData,
-        uint256[] calldata _callValue
-    ) private {
-        for (uint256 i = 0; i < _assets.length; i++) {
-            uint256 revenueTokenBalance = getRevenueTokenBalance(_assets[i]);
-
-            if (revenueTokenBalance > 0) {
-                emit FeesClaimed(_fund, _assets[i], revenueTokenBalance);
-                if (_oneInchData[i].length > 0) {
-                    swapAssetToXtk(_assets[i], _oneInchData[i], _callValue[i]);
-                }
-            }
-        }
-
-        uint256 xtkBalance = IERC20(xtk).balanceOf(address(this));
-        IERC20(xtk).safeTransfer(managementStakingModule, xtkBalance);
-
-        emit RevenueAccrued(_fund, xtkBalance, block.timestamp);
-    }
-
     function claimTerminalFeesAndSwap(
         address _token,
         bytes[] calldata _oneInchData,
@@ -163,6 +140,29 @@ contract RevenueController is Initializable, OwnableUpgradeable {
         IERC20(xtk).safeTransfer(managementStakingModule, xtkBalance);
 
         emit RevenueAccrued(fund, xtkBalance, block.timestamp);
+    }
+
+    function swapAssets (
+        address _fund,
+        address[] memory _assets,
+        bytes[] calldata _oneInchData,
+        uint256[] calldata _callValue
+    ) private {
+        for (uint256 i = 0; i < _assets.length; i++) {
+            uint256 revenueTokenBalance = getRevenueTokenBalance(_assets[i]);
+
+            if (revenueTokenBalance > 0) {
+                emit FeesClaimed(_fund, _assets[i], revenueTokenBalance);
+                if (_oneInchData[i].length > 0) {
+                    swapAssetToXtk(_assets[i], _oneInchData[i], _callValue[i]);
+                }
+            }
+        }
+
+        uint256 xtkBalance = IERC20(xtk).balanceOf(address(this));
+        IERC20(xtk).safeTransfer(managementStakingModule, xtkBalance);
+
+        emit RevenueAccrued(_fund, xtkBalance, block.timestamp);
     }
 
     function swapAssetToXtk(
