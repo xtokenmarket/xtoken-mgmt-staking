@@ -104,21 +104,38 @@ contract RevenueController is Initializable, OwnableUpgradeable {
 
     function claimTerminalFeesAndSwap(
         address _token,
-        bytes[] calldata _oneInchData,
-        uint256[] calldata _callValue
+        bytes calldata _oneInchData,
+        uint256 _callValue
     ) external onlyOwnerOrManager {
         require(_token != address(0), "Invalid token address");
-        require(_oneInchData.length == 2, "Params mismatch");
-        require(_callValue.length == 2, "Params mismatch");
 
         ILMTerminal(terminal).withdrawFees(_token);
 
-        address[] memory assets = new address[](2);
+        uint256 revenueTokenBalance = getRevenueTokenBalance(_token);
 
-        assets[0] = ETH_ADDRESS;
-        assets[1] = _token;
+        if (revenueTokenBalance > 0) {
+            emit FeesClaimed(terminal, _token, revenueTokenBalance);
+            if (_oneInchData.length > 0) {
+                swapAssetToXtk(_token, _oneInchData, _callValue);
+            }
+        }
 
-        swapAssets(terminal, assets, _oneInchData, _callValue);
+        claimXtkForStaking(terminal);
+    }
+
+    function swapTerminalETH(
+        bytes calldata _oneInchData,
+        uint256 _callValue
+    ) external onlyOwnerOrManager {
+        uint256 amount = address(this).balance;
+
+        require(amount > 0, "Insufficient ETH");
+        require(_oneInchData.length > 0, "Invalid oneInch data");
+
+        emit FeesClaimed(terminal, ETH_ADDRESS, amount);
+        swapAssetToXtk(ETH_ADDRESS, _oneInchData, _callValue);
+
+        claimXtkForStaking(terminal);
     }
 
     function swapOnceClaimed(
@@ -136,10 +153,7 @@ contract RevenueController is Initializable, OwnableUpgradeable {
 
         swapAssetToXtk(fundAssets[_fundAssetIndex], _oneInchData, _callValue);
 
-        uint256 xtkBalance = IERC20(xtk).balanceOf(address(this));
-        IERC20(xtk).safeTransfer(managementStakingModule, xtkBalance);
-
-        emit RevenueAccrued(fund, xtkBalance, block.timestamp);
+        claimXtkForStaking(fund);
     }
 
     function swapAssets (
@@ -159,10 +173,7 @@ contract RevenueController is Initializable, OwnableUpgradeable {
             }
         }
 
-        uint256 xtkBalance = IERC20(xtk).balanceOf(address(this));
-        IERC20(xtk).safeTransfer(managementStakingModule, xtkBalance);
-
-        emit RevenueAccrued(_fund, xtkBalance, block.timestamp);
+        claimXtkForStaking(_fund);
     }
 
     function swapAssetToXtk(
@@ -188,6 +199,13 @@ contract RevenueController is Initializable, OwnableUpgradeable {
             preActionFundAssetBalance - postActionFundAssetBalance,
             postActionXtkBalance - preActionXtkBalance
         );
+    }
+
+    function claimXtkForStaking(address _fund) private {
+        uint256 xtkBalance = IERC20(xtk).balanceOf(address(this));
+        IERC20(xtk).safeTransfer(managementStakingModule, xtkBalance);
+
+        emit RevenueAccrued(_fund, xtkBalance, block.timestamp);
     }
 
     function snapshotTargetAssetAndXtkBalance(address _fundAsset) private view returns (uint256, uint256) {
