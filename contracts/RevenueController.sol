@@ -99,7 +99,18 @@ contract RevenueController is Initializable, OwnableUpgradeable {
 
         IxAsset(fund).withdrawFees();
 
-        swapAssets(fund, fundAssets, _oneInchData, _callValue);
+        for (uint256 i = 0; i < fundAssets.length; i++) {
+            uint256 revenueTokenBalance = getRevenueTokenBalance(fundAssets[i]);
+
+            if (revenueTokenBalance > 0) {
+                emit FeesClaimed(fund, fundAssets[i], revenueTokenBalance);
+                if (_oneInchData[i].length > 0) {
+                    swapAssetToXtk(fundAssets[i], _oneInchData[i], _callValue[i]);
+                }
+            }
+        }
+
+        claimXtkForStaking(fund);
     }
 
     function claimTerminalFeesAndSwap(
@@ -154,26 +165,6 @@ contract RevenueController is Initializable, OwnableUpgradeable {
         swapAssetToXtk(fundAssets[_fundAssetIndex], _oneInchData, _callValue);
 
         claimXtkForStaking(fund);
-    }
-
-    function swapAssets (
-        address _fund,
-        address[] memory _assets,
-        bytes[] calldata _oneInchData,
-        uint256[] calldata _callValue
-    ) private {
-        for (uint256 i = 0; i < _assets.length; i++) {
-            uint256 revenueTokenBalance = getRevenueTokenBalance(_assets[i]);
-
-            if (revenueTokenBalance > 0) {
-                emit FeesClaimed(_fund, _assets[i], revenueTokenBalance);
-                if (_oneInchData[i].length > 0) {
-                    swapAssetToXtk(_assets[i], _oneInchData[i], _callValue[i]);
-                }
-            }
-        }
-
-        claimXtkForStaking(_fund);
     }
 
     function swapAssetToXtk(
