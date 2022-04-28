@@ -45,6 +45,8 @@ contract RevenueController is Initializable, OwnableUpgradeable {
 
     address public constant terminal = 0x090559D58aAB8828C27eE7a7EAb18efD5bB90374;
 
+    address public constant AGGREGATION_ROUTER_V4 = 0x1111111254fb6c44bAC0beD2854e76F90643097d;
+
     /* ============ Events ============ */
 
     event FeesClaimed(address indexed fund, address indexed revenueToken, uint256 revenueTokenAmount);
@@ -54,7 +56,7 @@ contract RevenueController is Initializable, OwnableUpgradeable {
 
     /* ============ Modifiers ============ */
 
-    modifier onlyOwnerOrManager {
+    modifier onlyOwnerOrManager() {
         require(
             msg.sender == owner() || IxTokenManager(xtokenManager).isManager(msg.sender, address(this)),
             "Non-admin caller"
@@ -105,6 +107,12 @@ contract RevenueController is Initializable, OwnableUpgradeable {
             if (revenueTokenBalance > 0) {
                 emit FeesClaimed(fund, fundAssets[i], revenueTokenBalance);
                 if (_oneInchData[i].length > 0) {
+                    if (
+                        fundAssets[i] != ETH_ADDRESS &&
+                        IERC20(fundAssets[i]).allowance(address(this), AGGREGATION_ROUTER_V4) < revenueTokenBalance
+                    ) {
+                        IERC20(fundAssets[i]).safeApprove(AGGREGATION_ROUTER_V4, type(uint256).max);
+                    }
                     swapAssetToXtk(fundAssets[i], _oneInchData[i], _callValue[i]);
                 }
             }
@@ -127,6 +135,9 @@ contract RevenueController is Initializable, OwnableUpgradeable {
         if (revenueTokenBalance > 0) {
             emit FeesClaimed(terminal, _token, revenueTokenBalance);
             if (_oneInchData.length > 0) {
+                if (IERC20(_token).allowance(address(this), AGGREGATION_ROUTER_V4) < revenueTokenBalance) {
+                    IERC20(_token).safeApprove(AGGREGATION_ROUTER_V4, type(uint256).max);
+                }
                 swapAssetToXtk(_token, _oneInchData, _callValue);
             }
         }
@@ -134,10 +145,7 @@ contract RevenueController is Initializable, OwnableUpgradeable {
         claimXtkForStaking(terminal);
     }
 
-    function swapTerminalETH(
-        bytes calldata _oneInchData,
-        uint256 _callValue
-    ) external onlyOwnerOrManager {
+    function swapTerminalETH(bytes calldata _oneInchData, uint256 _callValue) external onlyOwnerOrManager {
         uint256 amount = address(this).balance;
 
         require(amount > 0, "Insufficient ETH");
@@ -162,7 +170,16 @@ contract RevenueController is Initializable, OwnableUpgradeable {
 
         require(_fundAssetIndex < fundAssets.length, "Invalid fund asset index");
 
-        swapAssetToXtk(fundAssets[_fundAssetIndex], _oneInchData, _callValue);
+        address fundAsset = fundAssets[_fundAssetIndex];
+        if (fundAsset != ETH_ADDRESS) {
+            uint256 assetBalance = IERC20(fundAsset).balanceOf(address(this));
+
+            if (IERC20(fundAsset).allowance(address(this), AGGREGATION_ROUTER_V4) < assetBalance) {
+                IERC20(fundAsset).safeApprove(AGGREGATION_ROUTER_V4, type(uint256).max);
+            }
+        }
+
+        swapAssetToXtk(fundAsset, _oneInchData, _callValue);
 
         claimXtkForStaking(fund);
     }
@@ -178,12 +195,13 @@ contract RevenueController is Initializable, OwnableUpgradeable {
 
         bool success;
         // execute 1inch swap of eth/token for XTK
-        (success, ) = oneInchExchange.call{ value: _callValue }(_oneInchData);
+        (success, ) = AGGREGATION_ROUTER_V4.call{ value: _callValue }(_oneInchData);
 
         require(success, "Low-level call with value failed");
 
-        (uint256 postActionFundAssetBalance, uint256 postActionXtkBalance) =
-            snapshotTargetAssetAndXtkBalance(_fundAsset);
+        (uint256 postActionFundAssetBalance, uint256 postActionXtkBalance) = snapshotTargetAssetAndXtkBalance(
+            _fundAsset
+        );
 
         emit AssetSwappedToXtk(
             _fundAsset,
@@ -221,10 +239,10 @@ contract RevenueController is Initializable, OwnableUpgradeable {
 
         for (uint256 i = 0; i < _assets.length; ++i) {
             if (_assets[i] != ETH_ADDRESS) {
-                if(IERC20(_assets[i]).allowance(address(this), oneInchExchange) > 0) {
-                    IERC20(_assets[i]).safeApprove(oneInchExchange, 0);    
+                if (IERC20(_assets[i]).allowance(address(this), AGGREGATION_ROUTER_V4) > 0) {
+                    IERC20(_assets[i]).safeApprove(AGGREGATION_ROUTER_V4, 0);
                 }
-                IERC20(_assets[i]).safeApprove(oneInchExchange, type(uint256).max);
+                IERC20(_assets[i]).safeApprove(AGGREGATION_ROUTER_V4, type(uint256).max);
             }
         }
 
