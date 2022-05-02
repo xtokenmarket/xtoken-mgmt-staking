@@ -7,7 +7,7 @@ task(UPGRADE_REVENUE_CONTROLLER, "Upgrade Revenue Controller")
   .addParam("proxy", "Original proxy address")
   .addParam("admin", "Proxy Admin address")
   .setAction(async ({ proxy, admin: proxyAdminAddress }, { ethers, run, network }) => {
-    console.log("Upgrading contract in: ", network);
+    console.log("Upgrading contract in: ", network.name);
     const RevenueController = await ethers.getContractFactory("RevenueController");
     const revenueController = <RevenueController>await RevenueController.deploy();
     await revenueController.deployed();

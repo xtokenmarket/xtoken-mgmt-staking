@@ -116,6 +116,15 @@ async function deployForked() {
   console.log("ETH balance for terminal: ", ethers.utils.formatEther(newTerminalETHBalance));
   console.log("XTK amount claimed: ", ethers.utils.formatEther(newXtkBalance.sub(oldXtkBalance)));
   console.log("\n===============================================\n");
+
+  // Read state variables
+  console.log("Next Fund Index: ", await revenueController.nextFundIndex());
+  console.log("XTK: ", await revenueController.xtk());
+  console.log("Management staking module address: ", await revenueController.managementStakingModule());
+  console.log("1Inch exchange address for v3: ", await revenueController.oneInchExchange());
+  console.log("xToken Manager: ", await revenueController.xtokenManager());
+  console.log("Terminal address: ", await revenueController.terminal());
+  console.log("Aggregation router v4: ", await revenueController.AGGREGATION_ROUTER_V4());
 }
 
 deployForked()
