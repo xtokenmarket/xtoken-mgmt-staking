@@ -7,6 +7,7 @@ import "@nomiclabs/hardhat-etherscan";
 
 import "./tasks/accounts";
 import "./tasks/clean";
+import "./tasks/upgrade";
 
 import { resolve } from "path";
 

@@ -151,7 +151,7 @@ contract RevenueController is Initializable, OwnableUpgradeable {
         require(amount > 0, "Insufficient ETH");
         require(_oneInchData.length > 0, "Invalid oneInch data");
 
-        emit FeesClaimed(terminal, ETH_ADDRESS, amount);
+        emit FeesClaimed(terminal, ETH_ADDRESS, _callValue);
         swapAssetToXtk(ETH_ADDRESS, _oneInchData, _callValue);
 
         claimXtkForStaking(terminal);

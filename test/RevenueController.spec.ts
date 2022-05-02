@@ -15,7 +15,7 @@ async function getOneInchData(fromTokenAddress: string, toTokenAddress: string, 
   return data.tx;
 }
 
-describe("RevenueController Test", () => {
+describe.only("RevenueController Test", () => {
   let deployer: SignerWithAddress;
   let xTokenDeployer: Signer;
   let multisig: Signer;
@@ -29,7 +29,6 @@ describe("RevenueController Test", () => {
   let citaDAO: IERC20;
   let proxyAdmin: ProxyAdmin;
 
-  const oneInchV3 = "0x11111112542D85B3EF69AE05771c2dCCff4fAa26";
   const oneInchV4 = "0x1111111254fb6c44bAC0beD2854e76F90643097d";
   const xTokenDeployerAddress = "0x38138586AedB29B436eAB16105b09c317F5a79dd";
   const multiSigAddress = "0x105Ed4E2980CC60A13DdF854c75133434D6b4074";
@@ -55,13 +54,24 @@ describe("RevenueController Test", () => {
 
     await unlockAccount(multiSigAddress);
     multisig = await ethers.provider.getSigner(multiSigAddress);
+
     await deployer.sendTransaction({
       to: multiSigAddress,
       value: ether(10),
     });
 
+    // xToken: transfer ownership from deploy to the RevenueController
+    await unlockAccount(xTokenDeployerAddress);
+    xTokenDeployer = await ethers.provider.getSigner(xTokenDeployerAddress);
+
+    await deployer.sendTransaction({
+      to: xTokenDeployerAddress,
+      value: ether(10),
+    });
+
     const RevenueController = await ethers.getContractFactory("RevenueController");
     revenueController = <RevenueController>await RevenueController.deploy();
+    await revenueController.deployed();
 
     proxyAdmin = <ProxyAdmin>await ethers.getContractAt("ProxyAdmin", proxyAdminAddress);
 
@@ -82,10 +92,6 @@ describe("RevenueController Test", () => {
 
     xAAVEa = <IxAAVE>await ethers.getContractAt("IxAAVE", xAAVEaAddress);
     xAAVEb = <IxAAVE>await ethers.getContractAt("IxAAVE", xAAVEbAddress);
-
-    // xToken: transfer ownership from deploy to the RevenueController
-    await unlockAccount(xTokenDeployerAddress);
-    xTokenDeployer = await ethers.provider.getSigner(xTokenDeployerAddress);
 
     await deployer.sendTransaction({
       to: xTokenDeployer.getAddress(),
@@ -146,7 +152,7 @@ describe("RevenueController Test", () => {
     it("should be initialized correctly", async () => {
       expect(await revenueController.xtk()).to.equal(xtk.address);
       expect(await revenueController.managementStakingModule()).to.equal(mgmt);
-      expect(await revenueController.oneInchExchange()).to.equal(oneInchV3);
+      expect(await revenueController.AGGREGATION_ROUTER_V4()).to.equal(oneInchV4);
     });
 
     it("should add fund: xAAVEa if not added", async () => {
