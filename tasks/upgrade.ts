@@ -1,5 +1,5 @@
 import { task } from "hardhat/config";
-import { ProxyAdmin, RevenueController } from "typechain";
+import { ProxyAdmin, RevenueController } from "../typechain";
 
 import { UPGRADE_REVENUE_CONTROLLER } from "./task-names";
 
