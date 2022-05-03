@@ -5,9 +5,7 @@ import "solidity-coverage";
 import "@openzeppelin/hardhat-upgrades";
 import "@nomiclabs/hardhat-etherscan";
 
-import "./tasks/accounts";
-import "./tasks/clean";
-import "./tasks/upgrade";
+import "./tasks";
 
 import { resolve } from "path";
 
