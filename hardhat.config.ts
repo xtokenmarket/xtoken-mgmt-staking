@@ -5,8 +5,7 @@ import "solidity-coverage";
 import "@openzeppelin/hardhat-upgrades";
 import "@nomiclabs/hardhat-etherscan";
 
-import "./tasks/accounts";
-import "./tasks/clean";
+import "./tasks";
 
 import { resolve } from "path";
 
@@ -57,7 +56,6 @@ const config: HardhatUserConfig = {
       ],
       forking: {
         url: `https://eth-mainnet.alchemyapi.io/v2/${alchemyapi}`,
-        blockNumber: 13123953,
       },
       hardfork: "london",
       gasPrice: "auto",

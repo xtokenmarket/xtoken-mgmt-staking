@@ -43,6 +43,10 @@ contract RevenueController is Initializable, OwnableUpgradeable {
     // Index to xAsset
     mapping(uint256 => address) private _indexToFund;
 
+    address public constant terminal = 0x090559D58aAB8828C27eE7a7EAb18efD5bB90374;
+
+    address public constant AGGREGATION_ROUTER_V4 = 0x1111111254fb6c44bAC0beD2854e76F90643097d;
+
     /* ============ Events ============ */
 
     event FeesClaimed(address indexed fund, address indexed revenueToken, uint256 revenueTokenAmount);
@@ -52,7 +56,7 @@ contract RevenueController is Initializable, OwnableUpgradeable {
 
     /* ============ Modifiers ============ */
 
-    modifier onlyOwnerOrManager {
+    modifier onlyOwnerOrManager() {
         require(
             msg.sender == owner() || IxTokenManager(xtokenManager).isManager(msg.sender, address(this)),
             "Non-admin caller"
@@ -103,15 +107,54 @@ contract RevenueController is Initializable, OwnableUpgradeable {
             if (revenueTokenBalance > 0) {
                 emit FeesClaimed(fund, fundAssets[i], revenueTokenBalance);
                 if (_oneInchData[i].length > 0) {
+                    if (
+                        fundAssets[i] != ETH_ADDRESS &&
+                        IERC20(fundAssets[i]).allowance(address(this), AGGREGATION_ROUTER_V4) < revenueTokenBalance
+                    ) {
+                        IERC20(fundAssets[i]).safeApprove(AGGREGATION_ROUTER_V4, type(uint256).max);
+                    }
                     swapAssetToXtk(fundAssets[i], _oneInchData[i], _callValue[i]);
                 }
             }
         }
 
-        uint256 xtkBalance = IERC20(xtk).balanceOf(address(this));
-        IERC20(xtk).safeTransfer(managementStakingModule, xtkBalance);
+        claimXtkForStaking(fund);
+    }
 
-        emit RevenueAccrued(fund, xtkBalance, block.timestamp);
+    function claimTerminalFeesAndSwap(
+        address _token,
+        bytes calldata _oneInchData,
+        uint256 _callValue
+    ) external onlyOwnerOrManager {
+        require(_token != address(0), "Invalid token address");
+
+        ILMTerminal(terminal).withdrawFees(_token);
+
+        uint256 revenueTokenBalance = getRevenueTokenBalance(_token);
+
+        if (revenueTokenBalance > 0) {
+            emit FeesClaimed(terminal, _token, revenueTokenBalance);
+            if (_oneInchData.length > 0) {
+                if (IERC20(_token).allowance(address(this), AGGREGATION_ROUTER_V4) < revenueTokenBalance) {
+                    IERC20(_token).safeApprove(AGGREGATION_ROUTER_V4, type(uint256).max);
+                }
+                swapAssetToXtk(_token, _oneInchData, _callValue);
+            }
+        }
+
+        claimXtkForStaking(terminal);
+    }
+
+    function swapTerminalETH(bytes calldata _oneInchData, uint256 _callValue) external onlyOwnerOrManager {
+        uint256 amount = address(this).balance;
+
+        require(amount > 0, "Insufficient ETH");
+        require(_oneInchData.length > 0, "Invalid oneInch data");
+
+        emit FeesClaimed(terminal, ETH_ADDRESS, _callValue);
+        swapAssetToXtk(ETH_ADDRESS, _oneInchData, _callValue);
+
+        claimXtkForStaking(terminal);
     }
 
     function swapOnceClaimed(
@@ -127,12 +170,18 @@ contract RevenueController is Initializable, OwnableUpgradeable {
 
         require(_fundAssetIndex < fundAssets.length, "Invalid fund asset index");
 
-        swapAssetToXtk(fundAssets[_fundAssetIndex], _oneInchData, _callValue);
+        address fundAsset = fundAssets[_fundAssetIndex];
+        if (fundAsset != ETH_ADDRESS) {
+            uint256 assetBalance = IERC20(fundAsset).balanceOf(address(this));
 
-        uint256 xtkBalance = IERC20(xtk).balanceOf(address(this));
-        IERC20(xtk).safeTransfer(managementStakingModule, xtkBalance);
+            if (IERC20(fundAsset).allowance(address(this), AGGREGATION_ROUTER_V4) < assetBalance) {
+                IERC20(fundAsset).safeApprove(AGGREGATION_ROUTER_V4, type(uint256).max);
+            }
+        }
 
-        emit RevenueAccrued(fund, xtkBalance, block.timestamp);
+        swapAssetToXtk(fundAsset, _oneInchData, _callValue);
+
+        claimXtkForStaking(fund);
     }
 
     function swapAssetToXtk(
@@ -146,18 +195,26 @@ contract RevenueController is Initializable, OwnableUpgradeable {
 
         bool success;
         // execute 1inch swap of eth/token for XTK
-        (success, ) = oneInchExchange.call{ value: _callValue }(_oneInchData);
+        (success, ) = AGGREGATION_ROUTER_V4.call{ value: _callValue }(_oneInchData);
 
         require(success, "Low-level call with value failed");
 
-        (uint256 postActionFundAssetBalance, uint256 postActionXtkBalance) =
-            snapshotTargetAssetAndXtkBalance(_fundAsset);
+        (uint256 postActionFundAssetBalance, uint256 postActionXtkBalance) = snapshotTargetAssetAndXtkBalance(
+            _fundAsset
+        );
 
         emit AssetSwappedToXtk(
             _fundAsset,
             preActionFundAssetBalance - postActionFundAssetBalance,
             postActionXtkBalance - preActionXtkBalance
         );
+    }
+
+    function claimXtkForStaking(address _fund) private {
+        uint256 xtkBalance = IERC20(xtk).balanceOf(address(this));
+        IERC20(xtk).safeTransfer(managementStakingModule, xtkBalance);
+
+        emit RevenueAccrued(_fund, xtkBalance, block.timestamp);
     }
 
     function snapshotTargetAssetAndXtkBalance(address _fundAsset) private view returns (uint256, uint256) {
@@ -182,10 +239,10 @@ contract RevenueController is Initializable, OwnableUpgradeable {
 
         for (uint256 i = 0; i < _assets.length; ++i) {
             if (_assets[i] != ETH_ADDRESS) {
-                if(IERC20(_assets[i]).allowance(address(this), oneInchExchange) > 0) {
-                    IERC20(_assets[i]).safeApprove(oneInchExchange, 0);    
+                if (IERC20(_assets[i]).allowance(address(this), AGGREGATION_ROUTER_V4) > 0) {
+                    IERC20(_assets[i]).safeApprove(AGGREGATION_ROUTER_V4, 0);
                 }
-                IERC20(_assets[i]).safeApprove(oneInchExchange, type(uint256).max);
+                IERC20(_assets[i]).safeApprove(AGGREGATION_ROUTER_V4, type(uint256).max);
             }
         }
 
