@@ -28,7 +28,7 @@ task(CLAIM_ETH, "Claim eth").setAction(async (args, { ethers, artifacts }) => {
     data: { tx },
   } = await axios.get(apiUrl);
 
-  await revenueController.swapTerminalETH(tx.data, tx.value);
+  await (await revenueController.swapTerminalETH(tx.data, tx.value)).wait();
 
   const afterClaim = await xtk.balanceOf(stakingModuleAddress);
   const afterClaimEth = await ethers.provider.getBalance(revenueController.address);

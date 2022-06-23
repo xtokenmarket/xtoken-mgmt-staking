@@ -58,11 +58,11 @@ const config: HardhatUserConfig = {
         url: `https://eth-mainnet.alchemyapi.io/v2/${alchemyapi}`,
       },
       hardfork: "london",
-      gasPrice: "auto",
+      gas: 2000000,
     },
     mainnet: {
       accounts: [deployAccountKey],
-      // gasPrice: 150 * 10 ** 9, // 40 Gwei
+      gas: 2000000,
       chainId: chainIds.mainnet,
       url: `https://eth-mainnet.alchemyapi.io/v2/${alchemyapi}`,
       timeout: 200000,

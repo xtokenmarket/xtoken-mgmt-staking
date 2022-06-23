@@ -43,7 +43,7 @@ task(CLAIM_TERMINAL, "Claim terminal token")
       callValue = 0;
     }
 
-    await revenueController.claimTerminalFeesAndSwap(tokenAddress, oneInchData, callValue);
+    await (await revenueController.claimTerminalFeesAndSwap(tokenAddress, oneInchData, callValue)).wait();
 
     const afterClaim = await xtk.balanceOf(stakingModuleAddress);
     const afterClaimEth = await ethers.provider.getBalance(revenueController.address);
