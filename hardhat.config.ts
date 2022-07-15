@@ -38,6 +38,8 @@ if (!process.env.ALCHEMY_API_KEY) {
   alchemyapi = process.env.ALCHEMY_API_KEY;
 }
 
+// TODO: revert to initial config
+
 const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
   gasReporter: {
@@ -55,7 +57,7 @@ const config: HardhatUserConfig = {
         },
       ],
       forking: {
-        url: `https://eth-mainnet.alchemyapi.io/v2/${alchemyapi}`,
+        url: `https://eth-goerli.alchemyapi.io/v2/${alchemyapi}`,
       },
       hardfork: "london",
       gas: 2000000,

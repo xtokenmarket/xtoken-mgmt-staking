@@ -6,6 +6,7 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "./interface/IxAsset.sol";
+import "./interface/IOrigination.sol";
 import "./interface/IxTokenManager.sol";
 
 /**
@@ -46,6 +47,12 @@ contract RevenueController is Initializable, OwnableUpgradeable {
     address public constant terminal = 0x090559D58aAB8828C27eE7a7EAb18efD5bB90374;
 
     address public constant AGGREGATION_ROUTER_V4 = 0x1111111254fb6c44bAC0beD2854e76F90643097d;
+
+    // TODO: change back after tests implemented
+    address public constant origination = 0xa3C15A2c8f5daA9B8eef4eb01c000F19743CCaC1;
+
+    // // TODO: add origination core address when ready
+    // address public constant origination = address(0);
 
     /* ============ Events ============ */
 
@@ -157,13 +164,69 @@ contract RevenueController is Initializable, OwnableUpgradeable {
         claimXtkForStaking(terminal);
     }
 
+    function claimOriginationFeesAndSwap(
+        address _token,
+        bytes calldata _oneInchData,
+        uint256 _callValue
+    ) external onlyOwnerOrManager {
+        // TODO: remove this line when updating the origination core fund address
+        require(origination != address(0), "Origination core fund address not set");
+
+        require(_token != address(0), "Invalid token address");
+
+        IOrigination(origination).claimFees(_token);
+
+        uint256 revenueTokenBalance = getRevenueTokenBalance(_token);
+
+        if (revenueTokenBalance > 0) {
+            emit FeesClaimed(origination, _token, revenueTokenBalance);
+            if (_oneInchData.length > 0) {
+                if (IERC20(_token).allowance(address(this), AGGREGATION_ROUTER_V4) < revenueTokenBalance) {
+                    IERC20(_token).safeApprove(AGGREGATION_ROUTER_V4, type(uint256).max);
+                }
+                swapAssetToXtk(_token, _oneInchData, _callValue);
+            }
+        }
+
+        claimXtkForStaking(origination);
+    }
+
+    function swapOriginationETH(
+        bytes calldata _oneInchData,
+        uint256 _callValue
+    ) external onlyOwnerOrManager {
+        // TODO: remove this line when updating the origination core fund address
+        require(origination != address(0), "Origination core fund address not set");
+
+        IOrigination(origination).claimFees(address(0));
+
+        uint256 revenueTokenBalance = address(this).balance;
+        emit FeesClaimed(origination, ETH_ADDRESS, revenueTokenBalance);
+        
+        if (revenueTokenBalance > 0) {
+            emit FeesClaimed(origination, _token, revenueTokenBalance);
+            if (_oneInchData.length > 0) {
+                if (IERC20(_token).allowance(address(this), AGGREGATION_ROUTER_V4) < revenueTokenBalance) {
+                    IERC20(_token).safeApprove(AGGREGATION_ROUTER_V4, type(uint256).max);
+                }
+                swapAssetToXtk(_token, _oneInchData, _callValue);
+            }
+        }
+
+        claimXtkForStaking(origination);
+    }
+
+
     function swapAssetOnceClaimed(
         address fund,
         address asset,
         bytes calldata _oneInchData,
         uint256 _callValue
     ) external onlyOwnerOrManager {
-        require(fund == terminal, "Invalid fund");
+        // TODO: remove this line when updating the origination core fund address
+        require(fund != address(0), "Invalid fund address");
+
+        require(fund == terminal || fund == origination, "Invalid fund");
         require(asset != address(0), "Invalid asset address");
 
         uint256 assetBalance = IERC20(asset).balanceOf(address(this));

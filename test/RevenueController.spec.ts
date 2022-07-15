@@ -15,7 +15,7 @@ async function getOneInchData(fromTokenAddress: string, toTokenAddress: string, 
   return data.tx;
 }
 
-describe.only("RevenueController Test", () => {
+describe("RevenueController Test", () => {
   let deployer: SignerWithAddress;
   let xTokenDeployer: Signer;
   let multisig: Signer;
