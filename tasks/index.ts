@@ -5,3 +5,4 @@ export * from "./claim-eth";
 export * from "./claim-terminal";
 export * from "./one-inch";
 export * from "./upgrade";
+export * from "./swap-terminal-asset";

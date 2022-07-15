@@ -157,6 +157,27 @@ contract RevenueController is Initializable, OwnableUpgradeable {
         claimXtkForStaking(terminal);
     }
 
+    function swapAssetOnceClaimed(
+        address fund,
+        address asset,
+        bytes calldata _oneInchData,
+        uint256 _callValue
+    ) external onlyOwnerOrManager {
+        require(fund == terminal, "Invalid fund");
+        require(asset != address(0), "Invalid asset address");
+
+        uint256 assetBalance = IERC20(asset).balanceOf(address(this));
+        require(assetBalance > 0, "Insufficient asset amount");
+
+        if (IERC20(asset).allowance(address(this), AGGREGATION_ROUTER_V4) < assetBalance) {
+            IERC20(asset).safeApprove(AGGREGATION_ROUTER_V4, type(uint256).max);
+        }
+
+        swapAssetToXtk(asset, _oneInchData, _callValue);
+
+        claimXtkForStaking(terminal);
+    }
+
     function swapOnceClaimed(
         uint256 _fundIndex,
         uint256 _fundAssetIndex,

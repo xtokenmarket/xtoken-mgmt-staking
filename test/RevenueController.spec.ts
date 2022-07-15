@@ -27,6 +27,7 @@ describe.only("RevenueController Test", () => {
   let aave: IERC20;
   let xtk: IERC20;
   let citaDAO: IERC20;
+  let pnyd: IERC20;
   let proxyAdmin: ProxyAdmin;
 
   const oneInchV4 = "0x1111111254fb6c44bAC0beD2854e76F90643097d";
@@ -43,6 +44,7 @@ describe.only("RevenueController Test", () => {
   const terminalAddress = "0x090559D58aAB8828C27eE7a7EAb18efD5bB90374";
   const revenueControllerProxyAddress = "0x37310ee55D433E51530b3efE41990360D6dBCFC3";
   const citaDAOAddress = "0x3541A5C1b04AdABA0B83F161747815cd7B1516bC";
+  const pnydAddress = "0x71921C08586295b0B68e44A78a2DCA1E3f259721";
 
   async function getBalance(address: string) {
     return ethers.provider.getBalance(address);
@@ -89,6 +91,7 @@ describe.only("RevenueController Test", () => {
     aave = <IERC20>await ethers.getContractAt(erc20Artifacts.abi, aaveAddress);
     xtk = <IERC20>await ethers.getContractAt(erc20Artifacts.abi, xtkAddress);
     citaDAO = <IERC20>await ethers.getContractAt(erc20Artifacts.abi, citaDAOAddress);
+    pnyd = <IERC20>await ethers.getContractAt(erc20Artifacts.abi, pnydAddress);
 
     xAAVEa = <IxAAVE>await ethers.getContractAt("IxAAVE", xAAVEaAddress);
     xAAVEb = <IxAAVE>await ethers.getContractAt("IxAAVE", xAAVEbAddress);
@@ -119,6 +122,35 @@ describe.only("RevenueController Test", () => {
       )
         .to.emit(revenueController, "FeesClaimed")
         .emit(revenueController, "RevenueAccrued");
+    });
+  });
+
+  describe("swapOnceClaimedTerminal", () => {
+    let snapshotID: any;
+
+    beforeEach(async () => {
+      snapshotID = await getSnapShot();
+    });
+
+    afterEach(async () => {
+      await revertEvm(snapshotID);
+    });
+
+    it("should successfully swap asset amount existent at revenue controller address", async () => {
+      const revControllerPnydBalance = await pnyd.balanceOf(revenueController.address);
+      const swapAmount = revControllerPnydBalance.div(10);
+
+      const tx2 = await getOneInchData(pnydAddress, xtk.address, swapAmount.toString(), revenueController.address);
+
+      await expect(
+        revenueController
+          .connect(xTokenDeployer)
+          .swapAssetOnceClaimed(terminalAddress, pnydAddress, tx2.data, tx2.value),
+      )
+        .to.emit(revenueController, "FeesClaimed")
+        .emit(revenueController, "RevenueAccrued");
+
+      expect(await pnyd.balanceOf(revenueController.address)).to.eq(revControllerPnydBalance.sub(swapAmount));
     });
   });
 
