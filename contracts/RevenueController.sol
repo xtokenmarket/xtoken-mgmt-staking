@@ -48,8 +48,7 @@ contract RevenueController is Initializable, OwnableUpgradeable {
 
     address public constant AGGREGATION_ROUTER_V4 = 0x1111111254fb6c44bAC0beD2854e76F90643097d;
 
-    // TODO: add origination core address when deployed to mainnet
-    address public constant origination = address(0);
+    address public origination = address(0);
 
     /* ============ Events ============ */
 
@@ -166,9 +165,6 @@ contract RevenueController is Initializable, OwnableUpgradeable {
         bytes calldata _oneInchData,
         uint256 _callValue
     ) external onlyOwnerOrManager {
-        // TODO: remove this line when updating the origination core fund address
-        require(origination != address(0), "Origination core fund address not set");
-
         require(_token != address(0), "Invalid token address");
 
         IOriginationCore(origination).claimFees(_token);
@@ -189,9 +185,6 @@ contract RevenueController is Initializable, OwnableUpgradeable {
     }
 
     function swapOriginationETH(bytes calldata _oneInchData, uint256 _callValue) external onlyOwnerOrManager {
-        // TODO: remove this line when updating the origination core fund address
-        require(origination != address(0), "Origination core fund address not set");
-
         IOriginationCore(origination).claimFees(address(0));
         uint256 amount = address(this).balance;
 
@@ -210,9 +203,6 @@ contract RevenueController is Initializable, OwnableUpgradeable {
         bytes calldata _oneInchData,
         uint256 _callValue
     ) external onlyOwnerOrManager {
-        // TODO: remove this line when updating the origination core fund address
-        require(fund != address(0), "Invalid fund address");
-
         require(fund == terminal || fund == origination, "Invalid fund");
         require(asset != address(0), "Invalid asset address");
 
@@ -340,6 +330,10 @@ contract RevenueController is Initializable, OwnableUpgradeable {
      */
     function getFundAssets(address _fund) public view returns (address[] memory) {
         return _fundAssets[_fund];
+    }
+
+    function setOriginationAddress(address _address) external onlyOwner {
+        origination = _address;
     }
 
     /* ============ Fallbacks ============ */
