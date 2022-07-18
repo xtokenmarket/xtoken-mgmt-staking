@@ -48,7 +48,7 @@ task(CLAIM_TERMINAL_ASSET, "Claim terminal token")
     const afterClaim = await xtk.balanceOf(stakingModuleAddress);
     const afterClaimEth = await ethers.provider.getBalance(revenueController.address);
 
-    console.log("Claimed token: ", ethers.utils.formatEther(feeBalance));
+    console.log("Claimed token: ", feeBalance.toString());
     console.log("XTK amount claimed: ", ethers.utils.formatEther(afterClaim.sub(beforeClaim)));
     console.log("ETH claimed: ", ethers.utils.formatEther(afterClaimEth.sub(beforeClaimEth)));
   });

@@ -44,6 +44,6 @@ task(CLAIM_ORIGINATION_ASSET, "Claim origination token")
 
     const afterClaim = await xtk.balanceOf(stakingModuleAddress);
 
-    console.log("Claimed token: ", ethers.utils.formatUnits(feeBalance, await token.decimals()));
+    console.log("Claimed token: ", feeBalance.toString());
     console.log("XTK amount claimed: ", ethers.utils.formatEther(afterClaim.sub(beforeClaim)));
   });

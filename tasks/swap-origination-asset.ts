@@ -29,16 +29,13 @@ task(SWAP_ORIGINATION_ASSET, "Swap origination asset once claimed")
     } = await axios.get(apiUrl);
 
     const beforeClaimXtk = await xtk.balanceOf(stakingModuleAddress);
-    const beforeClaimAsset = await ethers.provider.getBalance(revenueController.address);
+    const beforeClaimAsset = await assetToken.balanceOf(revenueController.address);
 
     await revenueController.swapAssetOnceClaimed(originationAddress, tokenAddress, tx.data, tx.value);
 
     const afterClaimXtk = await xtk.balanceOf(stakingModuleAddress);
-    const afterClaimAsset = await ethers.provider.getBalance(revenueController.address);
+    const afterClaimAsset = await assetToken.balanceOf(revenueController.address);
 
-    console.log(
-      `Claimed ${await assetToken.symbol()}: `,
-      ethers.utils.formatUnits(beforeClaimAsset.sub(afterClaimAsset), await assetToken.decimals()),
-    );
+    console.log("Claimed asset amount: ", beforeClaimAsset.sub(afterClaimAsset).toString());
     console.log("XTK amount staked: ", ethers.utils.formatEther(afterClaimXtk.sub(beforeClaimXtk)));
   });
