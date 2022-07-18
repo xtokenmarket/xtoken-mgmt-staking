@@ -48,7 +48,7 @@ contract RevenueController is Initializable, OwnableUpgradeable {
 
     address public constant AGGREGATION_ROUTER_V4 = 0x1111111254fb6c44bAC0beD2854e76F90643097d;
 
-    address public origination = address(0);
+    address public origination;
 
     /* ============ Events ============ */
 
