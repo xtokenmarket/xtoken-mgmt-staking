@@ -28,6 +28,7 @@ describe("RevenueController Test", () => {
   let xtk: IERC20;
   let citaDAO: IERC20;
   let pnyd: IERC20;
+  let xyz: IERC20;
   let proxyAdmin: ProxyAdmin;
 
   const oneInchV4 = "0x1111111254fb6c44bAC0beD2854e76F90643097d";
@@ -42,9 +43,12 @@ describe("RevenueController Test", () => {
   const xAAVEbAddress = "0x704De5696dF237c5B9ba0De9ba7e0C63dA8eA0Df";
   const aaveAddress = "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9";
   const terminalAddress = "0x090559D58aAB8828C27eE7a7EAb18efD5bB90374";
+  // TODO: update origination core address when deploying it to mainnet
+  const originationAddress = "0xa3C15A2c8f5daA9B8eef4eb01c000F19743CCaC1";
   const revenueControllerProxyAddress = "0x37310ee55D433E51530b3efE41990360D6dBCFC3";
   const citaDAOAddress = "0x3541A5C1b04AdABA0B83F161747815cd7B1516bC";
   const pnydAddress = "0x71921C08586295b0B68e44A78a2DCA1E3f259721";
+  const xyzAddress = "0x67F0ecD58a6287d5ec8CA92b6Fda836EDa9aE41F";
 
   async function getBalance(address: string) {
     return ethers.provider.getBalance(address);
@@ -92,6 +96,7 @@ describe("RevenueController Test", () => {
     xtk = <IERC20>await ethers.getContractAt(erc20Artifacts.abi, xtkAddress);
     citaDAO = <IERC20>await ethers.getContractAt(erc20Artifacts.abi, citaDAOAddress);
     pnyd = <IERC20>await ethers.getContractAt(erc20Artifacts.abi, pnydAddress);
+    xyz = <IERC20>await ethers.getContractAt(erc20Artifacts.abi, xyzAddress);
 
     xAAVEa = <IxAAVE>await ethers.getContractAt("IxAAVE", xAAVEaAddress);
     xAAVEb = <IxAAVE>await ethers.getContractAt("IxAAVE", xAAVEbAddress);
@@ -124,6 +129,57 @@ describe("RevenueController Test", () => {
         .emit(revenueController, "RevenueAccrued");
     });
   });
+
+  xdescribe("claimOriginationFeesAndSwap", () => {
+    let snapshotID: any;
+
+    beforeEach(async () => {
+      snapshotID = await getSnapShot();
+    });
+
+    afterEach(async () => {
+      await revertEvm(snapshotID);
+    });
+
+    it("should claim XYZ token accrued in fees at Origination core address", async () => {
+      expect(await xyz.balanceOf(revenueController.address)).to.eq(0);
+      
+      const xyzOriginationBalance = await xyz.balanceOf(originationAddress);
+      const tx = await getOneInchData(xyzAddress, xtk.address, xyzOriginationBalance.toString(), revenueController.address);
+      const calldata = tx.data;
+      
+      await expect(
+        revenueController.connect(xTokenDeployer).claimOriginationFeesAndSwap(xyzAddress, calldata, tx.value)
+        )
+          .to.emit(revenueController, "FeesClaimed")
+          .emit(revenueController, "RevenueAccrued");
+
+      expect(await xyz.balanceOf(originationAddress)).to.eq(0);
+    });    
+  })
+
+  xdescribe("swapOriginationETH", () => {
+    let snapshotID: any;
+
+    beforeEach(async () => {
+      snapshotID = await getSnapShot();
+    });
+
+    afterEach(async () => {
+      await revertEvm(snapshotID);
+    });
+
+    it("should swap Origination ETH to XTK and stake it", async () => {
+      const originationBalance = await ethers.provider.getBalance(originationAddress);
+      const tx = await getOneInchData(ETH_ADDRESS, xtk.address, originationBalance.toString(), revenueController.address);
+      const calldata = tx.data;
+      await expect(
+        revenueController.connect(xTokenDeployer).swapOriginationETH(calldata, tx.value)
+        ).to.emit(revenueController, "FeesClaimed")
+        .emit(revenueController, "RevenueAccrued");
+      expect(await ethers.provider.getBalance(originationAddress)).to.eq(0);
+    });
+  })
 
   describe("swapOnceClaimedTerminal", () => {
     let snapshotID: any;

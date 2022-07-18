@@ -1,5 +1,5 @@
 pragma solidity ^0.8.0;
 
-interface IOrigination {
+interface IOriginationCore {
     function claimFees(address token) external;
 }

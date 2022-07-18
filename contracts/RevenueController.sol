@@ -48,11 +48,8 @@ contract RevenueController is Initializable, OwnableUpgradeable {
 
     address public constant AGGREGATION_ROUTER_V4 = 0x1111111254fb6c44bAC0beD2854e76F90643097d;
 
-    // TODO: change back after tests implemented
-    address public constant origination = 0xa3C15A2c8f5daA9B8eef4eb01c000F19743CCaC1;
-
-    // // TODO: add origination core address when ready
-    // address public constant origination = address(0);
+    // TODO: add origination core address when ready
+    address public constant origination = address(0);
 
     /* ============ Events ============ */
 
@@ -174,7 +171,7 @@ contract RevenueController is Initializable, OwnableUpgradeable {
 
         require(_token != address(0), "Invalid token address");
 
-        IOrigination(origination).claimFees(_token);
+        IOriginationCore(origination).claimFees(_token);
 
         uint256 revenueTokenBalance = getRevenueTokenBalance(_token);
 
@@ -191,31 +188,21 @@ contract RevenueController is Initializable, OwnableUpgradeable {
         claimXtkForStaking(origination);
     }
 
-    function swapOriginationETH(
-        bytes calldata _oneInchData,
-        uint256 _callValue
-    ) external onlyOwnerOrManager {
+    function swapOriginationETH(bytes calldata _oneInchData, uint256 _callValue) external onlyOwnerOrManager {
         // TODO: remove this line when updating the origination core fund address
         require(origination != address(0), "Origination core fund address not set");
 
-        IOrigination(origination).claimFees(address(0));
+        IOriginationCore(origination).claimFees(address(0));
+        uint256 amount = address(this).balance;
 
-        uint256 revenueTokenBalance = address(this).balance;
-        emit FeesClaimed(origination, ETH_ADDRESS, revenueTokenBalance);
-        
-        if (revenueTokenBalance > 0) {
-            emit FeesClaimed(origination, _token, revenueTokenBalance);
-            if (_oneInchData.length > 0) {
-                if (IERC20(_token).allowance(address(this), AGGREGATION_ROUTER_V4) < revenueTokenBalance) {
-                    IERC20(_token).safeApprove(AGGREGATION_ROUTER_V4, type(uint256).max);
-                }
-                swapAssetToXtk(_token, _oneInchData, _callValue);
-            }
-        }
+        require(amount > 0, "Insufficient ETH");
+        require(_oneInchData.length > 0, "Invalid oneInch data");
+
+        emit FeesClaimed(origination, ETH_ADDRESS, _callValue);
+        swapAssetToXtk(ETH_ADDRESS, _oneInchData, _callValue);
 
         claimXtkForStaking(origination);
     }
-
 
     function swapAssetOnceClaimed(
         address fund,
