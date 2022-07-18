@@ -225,7 +225,7 @@ contract RevenueController is Initializable, OwnableUpgradeable {
 
         swapAssetToXtk(asset, _oneInchData, _callValue);
 
-        claimXtkForStaking(terminal);
+        claimXtkForStaking(fund);
     }
 
     function swapOnceClaimed(
