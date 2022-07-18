@@ -3,14 +3,14 @@ import axios from "axios";
 
 import { RevenueController, IERC20 } from "../typechain";
 
-import { CLAIM_ETH } from "./task-names";
+import { SWAP_TERMINAL_ETH } from "./task-names";
 import { Artifact } from "hardhat/types";
 
 const REVENUE_CONTROLLER_PROXY_ADDRESS = "0x37310ee55D433E51530b3efE41990360D6dBCFC3";
 const XTK_ADDRESS = "0x7f3edcdd180dbe4819bd98fee8929b5cedb3adeb";
 const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 
-task(CLAIM_ETH, "Claim eth").setAction(async (args, { ethers, artifacts }) => {
+task(SWAP_TERMINAL_ETH, "Claim terminal eth fees").setAction(async (args, { ethers, artifacts }) => {
   const revenueController = <RevenueController>(
     await ethers.getContractAt("RevenueController", REVENUE_CONTROLLER_PROXY_ADDRESS)
   );
